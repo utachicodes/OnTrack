@@ -1,4 +1,10 @@
-import { pgTable, text, timestamp, integer, boolean, uuid, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, integer, boolean, uuid, pgEnum, customType } from 'drizzle-orm/pg-core'
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return 'bytea'
+  },
+})
 
 export const themePreferenceEnum = pgEnum('theme_preference', ['light', 'dark', 'system'])
 export const accentColorEnum = pgEnum('accent_color', ['coral', 'indigo', 'emerald', 'amber', 'violet', 'rose'])
@@ -38,5 +44,5 @@ export const exams = pgTable('exams', { id: uuid('id').defaultRandom().primaryKe
 export const focusSessions = pgTable('focus_sessions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), taskId: uuid('task_id'), durationMinutes: integer('duration_minutes').notNull(), status: text('status').notNull().default('planned'), startedAt: timestamp('started_at', { withTimezone: true }), completedAt: timestamp('completed_at', { withTimezone: true }), interruptions: integer('interruptions').notNull().default(0) })
 export const notificationPreferences = pgTable('notification_preferences', { userId: text('user_id').primaryKey(), reminders: boolean('reminders').notNull().default(true), examAlerts: boolean('exam_alerts').notNull().default(true), quietStart: text('quiet_start').notNull().default('22:00'), quietEnd: text('quiet_end').notNull().default('07:00'), updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull() })
 export const pushSubscriptions = pgTable('push_subscriptions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), endpoint: text('endpoint').notNull(), p256dh: text('p256dh').notNull(), auth: text('auth').notNull(), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
-export const learningDocuments = pgTable('learning_documents', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), subject: text('subject'), filename: text('filename').notNull(), pathname: text('pathname').notNull(), mimeType: text('mime_type').notNull(), status: text('status').notNull().default('uploaded'), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
+export const learningDocuments = pgTable('learning_documents', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), subject: text('subject'), filename: text('filename').notNull(), mimeType: text('mime_type').notNull(), status: text('status').notNull().default('uploaded'), data: bytea('data'), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
 export const aiConversations = pgTable('ai_conversations', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), title: text('title').notNull().default('Nouvelle conversation'), subject: text('subject'), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
