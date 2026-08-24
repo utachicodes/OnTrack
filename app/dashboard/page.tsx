@@ -21,6 +21,7 @@ export default async function DashboardPage() {
   const now = new Date()
   const weekStart = new Date(now)
   weekStart.setDate(now.getDate() - 7)
+  const nowMs = now.getTime()
 
   const [userTasks, userExams, recentFocus] = await Promise.all([
     db.select().from(tasks).where(eq(tasks.userId, userId)).orderBy(asc(tasks.dueAt)),
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       userName={session.user.name}
+      nowMs={nowMs}
       initialTasks={userTasks.map((t) => ({
         id: t.id,
         title: t.title,

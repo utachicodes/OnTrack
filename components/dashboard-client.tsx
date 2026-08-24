@@ -26,9 +26,6 @@ import {
   IconArrow,
   IconCheck,
   IconTrending,
-  IconSend,
-  IconHourglass,
-  IconReset,
 } from '@/components/icons'
 import { BrandMark } from '@/components/brand-mark'
 import { createTask, toggleTask, deleteTask } from '@/app/actions/tasks'
@@ -59,10 +56,10 @@ interface DashboardProps {
   initialTasks: Task[]
   initialExams: Exam[]
   focusThisWeek: number
+  nowMs: number
 }
 
 const SUBJECTS = ['Mathématiques', 'Physique', 'Français', 'Histoire', 'Philosophie', 'SVT', 'Anglais']
-
 type NavKey = 'overview' | 'tasks' | 'exams' | 'planning' | 'focus' | 'learn' | 'documents' | 'goals' | 'habits' | 'finance'
 
 interface NavItem {
@@ -86,21 +83,20 @@ const NAV: NavItem[] = [
   { key: 'finance', label: 'Finances', icon: IconFinance, accent: '#7d5fb8', group: 'me' },
 ]
 
-function formatDue(iso: string | null): { label: string; urgent: boolean; color: string } {
-  if (!iso) return { label: 'Pas d’échéance', urgent: false, color: '#7d8291' }
+function formatDue(iso: string | null, nowMs: number): { label: string; urgent: boolean; color: string } {
+  if (!iso) return { label: 'Pas d échéance', urgent: false, color: '#7d8291' }
   const d = new Date(iso)
-  const now = new Date()
-  const diff = Math.round((d.getTime() - now.getTime()) / 86400000)
+  const diff = Math.round((d.getTime() - nowMs) / 86400000)
   const date = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
-  if (diff < 0) return { label: `En retard · ${date}`, urgent: true, color: '#d8553f' }
-  if (diff === 0) return { label: `Aujourd’hui · ${date}`, urgent: true, color: '#ee705f' }
-  if (diff === 1) return { label: `Demain · ${date}`, urgent: true, color: '#ee705f' }
-  if (diff <= 7) return { label: `Dans ${diff} j · ${date}`, urgent: false, color: '#5b6066' }
+  if (diff < 0) return { label: `En retard - ${date}`, urgent: true, color: '#d8553f' }
+  if (diff === 0) return { label: `Aujourd hui - ${date}`, urgent: true, color: '#ee705f' }
+  if (diff === 1) return { label: `Demain - ${date}`, urgent: true, color: '#ee705f' }
+  if (diff <= 7) return { label: `Dans ${diff} j - ${date}`, urgent: false, color: '#5b6066' }
   return { label: date, urgent: false, color: '#5b6066' }
 }
 
-function daysUntil(iso: string): number {
-  return Math.max(0, Math.round((new Date(iso).getTime() - Date.now()) / 86400000))
+function daysUntil(iso: string, nowMs: number): number {
+  return Math.max(0, Math.round((new Date(iso).getTime() - nowMs) / 86400000))
 }
 
 function accentClass(p: Task['priority']): string {
@@ -109,7 +105,7 @@ function accentClass(p: Task['priority']): string {
   return 'pill-coral'
 }
 
-export function DashboardClient({ userName, initialTasks, initialExams, focusThisWeek }: DashboardProps) {
+export function DashboardClient({ userName, initialTasks, initialExams, focusThisWeek, nowMs }: DashboardProps) {
   const firstName = userName.trim().split(/\s+/)[0] || 'toi'
   const initials = userName.trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase()
 
@@ -122,9 +118,19 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
   const [collapsed, setCollapsed] = useState(false)
   const [showInstallPill, setShowInstallPill] = useState(false)
   const [activeBadge, setActiveBadge] = useState<NavKey | null>(null)
+
+  // Locale / time strings must come from the client to avoid hydration mismatch.
+  const [clientNow, setClientNow] = useState<number | null>(null)
+  useEffect(() => { setClientNow(nowMs) }, [nowMs])
+  const todayLabel = clientNow
+    ? new Date(clientNow).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase())
+    : ''
+  const timeLabel = clientNow
+    ? new Date(clientNow).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    : ''
+
   useEffect(() => {
     if (typeof window === 'undefined') return
-    setCollapsed(localStorage.getItem('ontrack.sidebar.collapsed') !== 'false')
     const deferred = (e: Event) => {
       e.preventDefault()
       window.deferredInstallPrompt = e
@@ -134,24 +140,8 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
     return () => window.removeEventListener('beforeinstallprompt', deferred)
   }, [])
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('ontrack.sidebar.collapsed', collapsed ? '1' : '0')
-    }
-  }, [collapsed])
-
   const completed = useMemo(() => tasks.filter((t) => t.status === 'done').length, [tasks])
   const nextExam = exams[0]
-  const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase())
-  const timeLabel = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-
-  const badgesByKey = useMemo(() => {
-    const m: Partial<Record<NavKey, number>> = {}
-    m.tasks = tasks.filter((t) => t.status === 'todo').length
-    m.exams = exams.length
-    m.learn = 4
-    return m
-  }, [tasks, exams])
 
   return (
     <main className={`app-shell ${collapsed ? 'is-rail' : 'is-expanded'}`}>
@@ -164,7 +154,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
           {collapsed ? <IconMenu size={16} /> : <IconClose size={16} />}
         </button>
 
-        <Link href="/dashboard" className="brand" aria-label="OnTrack · Utachi Industries">
+        <Link href="/dashboard" className="brand" aria-label="OnTrack - Utachi Industries">
           <BrandMark height={collapsed ? 24 : 28} variant={collapsed ? 'mark' : 'full'} priority />
         </Link>
 
@@ -173,7 +163,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
           {!collapsed && (
             <div className="profile-meta">
               <strong>{userName}</strong>
-              <span>Terminale · BAC 2026</span>
+              <span>Terminale - BAC 2026</span>
             </div>
           )}
         </div>
@@ -186,7 +176,6 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
               item={item}
               collapsed={collapsed}
               active={nav === item.key}
-              badge={badgesByKey[item.key] ?? 0}
               onSelect={() => { setNav(item.key); setMobileOpen(false) }}
             />
           ))}
@@ -203,7 +192,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
           {!collapsed && <p className="nav-label second">Outils</p>}
           <SidebarLink href="/flashcards" icon={<IconLearn size={16} />} label="Flashcards" collapsed={collapsed} />
           <SidebarLink href="/examen-blanc" icon={<IconExams size={16} />} label="Examen blanc" collapsed={collapsed} />
-         </nav>
+        </nav>
 
         <div className="sidebar-bottom">
           <SidebarLink href="/settings" icon={<IconSettings size={16} />} label="Réglages" collapsed={collapsed} />
@@ -211,7 +200,6 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
             <span className="nav-icon"><IconBell size={16} /></span>
             {!collapsed && <span>Notifications</span>}
             {!collapsed && <i className="dot" />}
-            {collapsed && <span className="sr-only">Notifications</span>}
           </button>
           <button
             className="nav-item"
@@ -236,7 +224,6 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
             {mobileOpen ? <IconClose size={18} /> : <IconMenu size={18} />}
           </button>
           <div className="crumb">
-            <span className="crumb-emoji">✦</span>
             <span>Mon espace</span>
             <IconChevron size={12} />
             <strong>{NAV.find((n) => n.key === nav)?.label}</strong>
@@ -245,7 +232,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
             <button className="search-pill">
               <IconSearch size={14} />
               <span>Rechercher</span>
-              <kbd>⌘K</kbd>
+              <kbd>⌘ K</kbd>
             </button>
             <button className="icon-button" aria-label="Notifications" onClick={() => setShowPush(true)}>
               <IconBell size={16} />
@@ -276,19 +263,21 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
         <div className="content">
           <div className="welcome-row">
             <div>
-              <p className="eyebrow"><span className="dot-coral" /> {todayLabel} · {timeLabel}</p>
-              <h1>Bonjour {firstName}<span className="wave">.</span></h1>
+              <p className="eyebrow">{todayLabel} {timeLabel && `- ${timeLabel}`}</p>
+              <h1>Bonjour {firstName}.</h1>
               <p className="subhead">Une nouvelle journée pour avancer sereinement vers ton BAC.</p>
             </div>
             <button className="primary-button" onClick={() => setModal('task')}>
-              <IconAdd size={16} /> Ajouter une tâche
+              <IconAdd size={17} /> Ajouter une tâche
             </button>
           </div>
 
           {nav === 'overview' && <OverviewView
-            tasks={tasks} completed={completed}
-            exams={exams} nextExam={nextExam}
+            tasks={tasks}
+            completed={completed}
+            nextExam={nextExam}
             focusThisWeek={focusThisWeek}
+            nowMs={nowMs}
             onTaskToggle={async (id) => {
               const updated = await toggleTask(id)
               setTasks((cur) => cur.map((t) => t.id === id ? { ...t, status: updated.status as 'todo' | 'done' } : t))
@@ -298,6 +287,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
           />}
 
           {nav === 'tasks' && <TasksView tasks={tasks}
+            nowMs={nowMs}
             onToggle={async (id) => {
               const updated = await toggleTask(id)
               setTasks((cur) => cur.map((t) => t.id === id ? { ...t, status: updated.status as 'todo' | 'done' } : t))
@@ -309,6 +299,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
             onAdd={() => setModal('task')} />}
 
           {nav === 'exams' && <ExamsView exams={exams}
+            nowMs={nowMs}
             onProgress={async (id, p) => {
               await updateExamProgress(id, p)
               setExams((cur) => cur.map((e) => e.id === id ? { ...e, preparationPercent: p } : e))
@@ -319,7 +310,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
             }}
             onAdd={() => setModal('exam')} />}
 
-          {nav === 'planning' && <PlanningView exams={exams} tasks={tasks} />}
+          {nav === 'planning' && <PlanningView exams={exams} tasks={tasks} nowMs={nowMs} />}
           {nav === 'focus' && <FocusView thisWeek={focusThisWeek} />}
           {nav === 'learn' && <LearnView />}
           {nav === 'documents' && <DocumentsView />}
@@ -360,11 +351,10 @@ interface NavButtonProps {
   item: NavItem
   collapsed: boolean
   active: boolean
-  badge?: number
   onSelect: () => void
 }
 
-function NavButton({ item, collapsed, active, badge, onSelect }: NavButtonProps) {
+function NavButton({ item, collapsed, active, onSelect }: NavButtonProps) {
   const Icon = item.icon
   return (
     <button
@@ -375,8 +365,6 @@ function NavButton({ item, collapsed, active, badge, onSelect }: NavButtonProps)
     >
       <span className="nav-icon"><Icon size={18} /></span>
       {!collapsed && <span className="nav-label-text">{item.label}</span>}
-      {!collapsed && badge !== undefined && badge > 0 ? <em className="nav-badge">{badge}</em> : null}
-      {collapsed && badge !== undefined && badge > 0 ? <span className="nav-badge-pill">{badge}</span> : null}
     </button>
   )
 }
@@ -391,47 +379,53 @@ function SidebarLink({ href, icon, label, collapsed }: { href: string; icon: Rea
 }
 
 /* ============================================================
-   OVERVIEW — viewport-fit, no scroll
+   OVERVIEW
    ============================================================ */
 interface OverviewProps {
   tasks: Task[]
   completed: number
-  exams: Exam[]
   nextExam: Exam | undefined
   focusThisWeek: number
+  nowMs: number
   onTaskToggle: (id: string) => void
   onAddTask: () => void
   onAddExam: () => void
 }
-function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTaskToggle, onAddTask, onAddExam }: OverviewProps) {
+
+function OverviewView({ tasks, completed, nextExam, focusThisWeek, nowMs, onTaskToggle, onAddTask, onAddExam }: OverviewProps) {
   const recent = tasks.slice(0, 5)
+  const todoCount = tasks.filter((t) => t.status === 'todo').length
+  const totalMinutes = tasks.reduce((s, t) => s + (t.status === 'done' ? 0 : t.estimatedMinutes), 0)
+
   return (
     <div className="overview-grid">
       <section className="panel hero-panel">
         <div className="hero-head">
-          <span className="kicker"><IconSparkles size={13} /> Aujourd’hui</span>
-          <span className="kicker-meta"><IconHourglass size={12} /> {focusThisWeek} sessions cette semaine</span>
+          <span className="kicker"><IconSparkles size={13} /> Aujourd hui</span>
+          <span className="kicker-meta"><IconHourglassInline /> {focusThisWeek} sessions cette semaine</span>
         </div>
         <h2>Ton attention, au bon endroit.</h2>
-        <p className="hero-sub">Tu as <strong>{tasks.filter((t) => t.status === 'todo').length} tâche{tasks.filter((t) => t.status === 'todo').length > 1 ? 's' : ''}</strong> en cours et <strong>{exams.length} examen{exams.length > 1 ? 's' : ''}</strong> à préparer. Continue.</p>
+        <p className="hero-sub">
+          Tu as <strong>{todoCount} tache{todoCount > 1 ? 's' : ''}</strong> en cours et <strong>{nextExam ? 1 : 0} examen{nextExam ? '' : ''}</strong> à préparer. Continue.
+        </p>
         <div className="progress-line"><span style={{ width: `${tasks.length ? (completed / tasks.length) * 100 : 0}%` }} /></div>
         <div className="hero-meta">
           <span><IconCheck size={13} /> {completed} terminées</span>
-          <span><IconTimer size={13} /> {tasks.reduce((s, t) => s + (t.status === 'done' ? 0 : t.estimatedMinutes), 0)} min restantes</span>
+          <span><IconTimer size={13} /> {totalMinutes} min restantes</span>
         </div>
       </section>
 
       <section className="panel tasks-panel">
         <header className="panel-header">
           <div>
-            <p className="eyebrow">À faire</p>
+            <p className="eyebrow">A faire</p>
             <h3>Tâches du jour</h3>
           </div>
           <button className="round-add" onClick={onAddTask} aria-label="Ajouter une tâche"><IconAdd size={16} /></button>
         </header>
         <div className="task-list compact">
           {recent.map((task) => {
-            const due = formatDue(task.dueAt)
+            const due = formatDue(task.dueAt, nowMs)
             return (
               <button className={`task-row ${task.status === 'done' ? 'is-done' : ''}`} key={task.id} onClick={() => onTaskToggle(task.id)}>
                 <span className={`check-circle ${task.status === 'done' ? 'is-checked' : ''}`}>
@@ -439,17 +433,14 @@ function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTask
                 </span>
                 <div className="task-body">
                   <strong>{task.title}</strong>
-                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> · {task.estimatedMinutes} min</small>
+                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> - {task.estimatedMinutes} min</small>
                 </div>
                 <span className="task-due" style={{ color: due.color }}>{due.label}</span>
               </button>
             )
           })}
           {recent.length === 0 && (
-            <div className="empty">
-              <IconSparkles size={20} />
-              <p>Aucune tâche. <button onClick={onAddTask}>Ajouter une première</button>.</p>
-            </div>
+            <p className="empty">Aucune tâche. <button onClick={onAddTask}>Ajouter une première</button>.</p>
           )}
         </div>
       </section>
@@ -464,7 +455,7 @@ function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTask
         </header>
         <div className="streak">
           <strong>{focusThisWeek}</strong>
-          <span>sessions<br />complétées</span>
+          <span>sessions<br />de focus<br />terminées</span>
           <div className="streak-flame"><IconFlame size={28} /></div>
         </div>
         <div className="week-bars">
@@ -478,18 +469,15 @@ function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTask
             )
           })}
         </div>
-        <Link href="#" onClick={(e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent('nav:focus')) }} className="panel-footer">
-          Démarrer une session <IconArrow size={13} />
-        </Link>
       </section>
 
       <section className="panel exam-panel">
         <header className="panel-header">
           <div>
-            <p className="eyebrow">À surveiller</p>
+            <p className="eyebrow">A surveiller</p>
             <h3>Prochain examen</h3>
           </div>
-          {nextExam && <span className="days-badge">J−{daysUntil(nextExam.examAt)}</span>}
+          {nextExam && <span className="days-badge">J-{daysUntil(nextExam.examAt, nowMs)}</span>}
         </header>
         {nextExam ? (
           <>
@@ -533,57 +521,72 @@ function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTask
         <header className="panel-header">
           <div>
             <p className="eyebrow">Calendrier</p>
-            <h3>Échéances à venir</h3>
+            <h3>Echéances à venir</h3>
           </div>
         </header>
         <div className="agenda-list">
-          {exams.slice(0, 3).map((exam) => {
-            const d = new Date(exam.examAt)
-            const days = daysUntil(exam.examAt)
+          {examsForAgenda(tasks, (window as unknown as { __exams?: Exam[] }).__exams ?? []).slice(0, 3).map((item, i) => {
+            const d = new Date(item.at)
+            const days = daysUntil(item.at, nowMs)
             return (
-              <div className="agenda-row" key={exam.id}>
+              <div className="agenda-row" key={`${item.kind}-${i}`}>
                 <div className={`date-chip ${days <= 7 ? 'urgent' : ''}`}>
                   <strong>{d.getDate()}</strong>
                   <span>{d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase()}</span>
                 </div>
                 <div className="agenda-body">
-                  <strong>{exam.title}</strong>
-                  <small>{exam.subject} · {exam.preparationPercent}% prêt</small>
+                  <strong>{item.title}</strong>
+                  <small>{item.sub}</small>
                 </div>
-                <span className={`agenda-tag ${days <= 7 ? 'urgent' : ''}`}>{days <= 1 ? 'Demain' : days === 0 ? 'Aujourd’hui' : `J−${days}`}</span>
+                <span className={`agenda-tag ${days <= 7 ? 'urgent' : ''}`}>
+                  {days <= 1 ? 'Demain' : days === 0 ? 'Aujourd hui' : `J-${days}`}
+                </span>
               </div>
             )
           })}
-          {exams.length === 0 && <p className="empty-line">Aucun examen planifié.</p>}
         </div>
       </section>
     </div>
   )
 }
 
+function IconHourglassInline() {
+  return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+    <path d="M7 3h10M7 21h10" />
+    <path d="M7 4c0 4 5 5 5 8s-5 4-5 8" />
+    <path d="M17 4c0 4-5 5-5 8s5 4 5 8" />
+  </svg>
+}
+
+function examsForAgenda(tasks: Task[], exams: Exam[]) {
+  const items: Array<{ kind: 'exam' | 'task'; at: string; title: string; sub: string }> = [
+    ...exams.map((e) => ({ kind: 'exam' as const, at: e.examAt, title: e.title, sub: e.subject })),
+    ...tasks.filter((t) => t.dueAt).map((t) => ({ kind: 'task' as const, at: t.dueAt!, title: t.title, sub: t.subject })),
+  ]
+  return items.sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
+}
+
 /* ============================================================
-   TASKS view (full)
+   TASKS view
    ============================================================ */
 interface TasksProps {
   tasks: Task[]
+  nowMs: number
   onToggle: (id: string) => void
   onDelete: (id: string) => void
   onAdd: () => void
 }
-function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
+function TasksView({ tasks, nowMs, onToggle, onDelete, onAdd }: TasksProps) {
   const [filter, setFilter] = useState<'all' | 'todo' | 'done'>('all')
   const filtered = tasks.filter((t) => filter === 'all' || t.status === filter)
   return (
     <>
       <div className="section-heading">
-        <div>
-          <p className="eyebrow">Espace de travail</p>
-          <h2>Tâches</h2>
-        </div>
+        <div><p className="eyebrow">Espace de travail</p><h2>Tâches</h2></div>
         <div className="segmented">
           {(['all', 'todo', 'done'] as const).map((k) => (
             <button key={k} className={filter === k ? 'is-active' : ''} onClick={() => setFilter(k)}>
-              {k === 'all' ? 'Toutes' : k === 'todo' ? 'À faire' : 'Faites'}
+              {k === 'all' ? 'Toutes' : k === 'todo' ? 'A faire' : 'Faites'}
             </button>
           ))}
         </div>
@@ -591,14 +594,14 @@ function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
       <section className="panel">
         <div className="panel-header">
           <div>
-            <h3>{filtered.length} tâche{filtered.length > 1 ? 's' : ''}</h3>
-            <span>Clique pour terminer · utilise la croix pour supprimer</span>
+            <h3>{filtered.length} tache{filtered.length > 1 ? 's' : ''}</h3>
+            <span>Clique pour terminer - croix pour supprimer</span>
           </div>
           <button className="round-add" onClick={onAdd} aria-label="Ajouter"><IconAdd size={16} /></button>
         </div>
         <div className="task-list">
           {filtered.map((task) => {
-            const due = formatDue(task.dueAt)
+            const due = formatDue(task.dueAt, nowMs)
             return (
               <div className={`task-row ${task.status === 'done' ? 'is-done' : ''}`} key={task.id}>
                 <button className="check-btn" onClick={() => onToggle(task.id)} aria-label="Basculer">
@@ -608,7 +611,7 @@ function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
                 </button>
                 <div className="task-body">
                   <strong>{task.title}</strong>
-                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> · {task.estimatedMinutes} min</small>
+                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> - {task.estimatedMinutes} min</small>
                 </div>
                 <span className="task-due" style={{ color: due.color }}>{due.label}</span>
                 <button className="ghost-button small" onClick={() => onDelete(task.id)} aria-label="Supprimer">
@@ -629,16 +632,15 @@ function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
    ============================================================ */
 interface ExamsProps {
   exams: Exam[]
+  nowMs: number
   onProgress: (id: string, percent: number) => void
   onDelete: (id: string) => void
   onAdd: () => void
 }
-function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
+function ExamsView({ exams, nowMs, onProgress, onDelete, onAdd }: ExamsProps) {
   return (
     <>
-      <div className="section-heading">
-        <div><p className="eyebrow">Préparation</p><h2>Examens</h2></div>
-      </div>
+      <div className="section-heading"><div><p className="eyebrow">Préparation</p><h2>Examens</h2></div></div>
       <section className="panel">
         <div className="panel-header">
           <div>
@@ -649,15 +651,15 @@ function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
         </div>
         <div className="exams-list">
           {exams.map((exam) => {
-            const days = daysUntil(exam.examAt)
+            const days = daysUntil(exam.examAt, nowMs)
             return (
               <div className="exam-card" key={exam.id}>
                 <div className="exam-card-head">
                   <div>
                     <strong>{exam.title}</strong>
-                    <span>{exam.subject} · {new Date(exam.examAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    <span>{exam.subject} - {new Date(exam.examAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
-                  <span className={`days-badge ${days <= 14 ? 'urgent' : ''}`}>J−{days}</span>
+                  <span className={`days-badge ${days <= 14 ? 'urgent' : ''}`}>J-{days}</span>
                 </div>
                 <div className="progress-row">
                   <input
@@ -682,17 +684,16 @@ function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
   )
 }
 
-function PlanningView({ exams, tasks }: { exams: Exam[]; tasks: Task[] }) {
-  const items = [
-    ...exams.map((e) => ({ kind: 'exam' as const, at: e.examAt, title: e.title, sub: e.subject })),
-    ...tasks.filter((t) => t.dueAt).map((t) => ({ kind: 'task' as const, at: t.dueAt!, title: t.title, sub: t.subject })),
-  ].sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
-
+/* ============================================================
+   PLANNING
+   ============================================================ */
+function PlanningView({ exams, tasks, nowMs }: { exams: Exam[]; tasks: Task[]; nowMs: number }) {
+  const items = examsForAgenda(tasks, exams)
   return (
     <>
       <div className="section-heading"><div><p className="eyebrow">Calendrier</p><h2>Planning</h2></div></div>
       <section className="panel">
-        <div className="panel-header"><div><h3>Échéances à venir</h3><span>Tâches et examens, triés par date</span></div></div>
+        <div className="panel-header"><div><h3>Echéances à venir</h3><span>Tâches et examens, triés par date</span></div></div>
         <div className="timeline">
           {items.slice(0, 30).map((item, i) => {
             const d = new Date(item.at)
@@ -710,13 +711,16 @@ function PlanningView({ exams, tasks }: { exams: Exam[]; tasks: Task[] }) {
               </div>
             )
           })}
-          {items.length === 0 && <p className="empty-line">Pas d’échéance programmée. Ajoute une tâche ou un examen.</p>}
+          {items.length === 0 && <p className="empty-line">Pas d échéance programmée. Ajoute une tâche ou un examen.</p>}
         </div>
       </section>
     </>
   )
 }
 
+/* ============================================================
+   FOCUS
+   ============================================================ */
 function FocusView({ thisWeek }: { thisWeek: number }) {
   return (
     <>
@@ -740,6 +744,9 @@ function FocusView({ thisWeek }: { thisWeek: number }) {
   )
 }
 
+/* ============================================================
+   LEARN
+   ============================================================ */
 function LearnView() {
   return (
     <>
@@ -747,20 +754,23 @@ function LearnView() {
       <section className="panel learn-cta">
         <div>
           <h3>4 pistes interactives</h3>
-          <p>Code, Python, Physique, Maths : leçons courtes, simulations vivantes, quiz.</p>
+          <p>Code, Python, Physique, Maths: leçons courtes, simulations vivantes, quiz.</p>
         </div>
-        <Link href="/learn" className="primary-button">Ouvrir l’académie <IconArrow size={14} /></Link>
+        <Link href="/learn" className="primary-button">Ouvrir l académie <IconArrow size={14} /></Link>
       </section>
     </>
   )
 }
 
+/* ============================================================
+   DOCUMENTS
+   ============================================================ */
 function DocumentsView() {
   return (
     <>
       <div className="section-heading"><div><p className="eyebrow">Bibliothèque</p><h2>Connaissances</h2></div></div>
       <section className="panel">
-        <div className="panel-header"><div><h3>Mes documents</h3><span>PDF, TXT, Markdown — 4 Mo max</span></div></div>
+        <div className="panel-header"><div><h3>Mes documents</h3><span>PDF, TXT, Markdown - 4 Mo max</span></div></div>
         <DocumentUpload />
         <DocumentList />
       </section>
@@ -780,7 +790,7 @@ function DocumentUpload() {
       const res = await fetch('/api/documents/upload', { method: 'POST', body: formData })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error ?? 'Échec de l’upload.')
+        setError(data.error ?? 'Échec de l upload.')
         return
       }
       setSuccess('Document enregistré.')
@@ -840,6 +850,9 @@ function DocumentList() {
   )
 }
 
+/* ============================================================
+   GOALS / HABITS / FINANCE
+   ============================================================ */
 function GoalsView() {
   const [items, setItems] = useState<Array<{ id: string; title: string; target: string; done: boolean }>>(() => readLocal('ontrack.goals', []))
   const [title, setTitle] = useState('')
@@ -854,7 +867,7 @@ function GoalsView() {
           onSubmit={(e) => {
             e.preventDefault()
             if (!title.trim()) return
-            const next = [...items, { id: crypto.randomUUID(), title: title.trim(), target: target.trim() || '—', done: false }]
+            const next = [...items, { id: crypto.randomUUID(), title: title.trim(), target: target.trim() || '-', done: false }]
             setItems(next); writeLocal('ontrack.goals', next)
             setTitle(''); setTarget('')
           }}
@@ -876,7 +889,7 @@ function GoalsView() {
               }}><IconClose size={12} /></button>
             </li>
           ))}
-          {items.length === 0 && <p className="empty-line">Aucun objectif pour l’instant.</p>}
+          {items.length === 0 && <p className="empty-line">Aucun objectif pour l instant.</p>}
         </ul>
       </section>
     </>
@@ -885,14 +898,14 @@ function GoalsView() {
 
 function HabitsView({ thisWeek }: { thisWeek: number }) {
   const [checks, setChecks] = useState<Record<string, boolean>>(() => readLocal('ontrack.habits', {}))
-  const habits = ['Lire 20 min', 'Réviser les flashcards', 'Boire 1,5L d’eau', 'Marcher 30 min']
+  const habits = ['Lire 20 min', 'Réviser les flashcards', 'Boire 1,5L d eau', 'Marcher 30 min']
   const today = new Date().toISOString().slice(0, 10)
   const done = Object.values(checks[`${today}`] ?? {}).filter(Boolean).length
   return (
     <>
       <div className="section-heading"><div><p className="eyebrow">Rythme</p><h2>Habitudes</h2></div></div>
       <section className="panel">
-        <div className="panel-header"><div><h3>Aujourd’hui</h3><span>{done}/{habits.length} faites · {thisWeek} sessions de focus</span></div></div>
+        <div className="panel-header"><div><h3>Aujourd hui</h3><span>{done}/{habits.length} faites - {thisWeek} sessions de focus</span></div></div>
         <ul className="goal-list">
           {habits.map((h) => {
             const k = `${today}|${h}`
@@ -918,7 +931,7 @@ function FinanceView() {
       <div className="section-heading"><div><p className="eyebrow">Boursier</p><h2>Finances</h2></div></div>
       <section className="panel">
         <div className="panel-header"><div><h3>Suivi des dépenses</h3><span>Bientôt disponible</span></div></div>
-        <p className="empty-line">OnTrack se concentre d’abord sur tes révisions. Le suivi financier arrive dans une prochaine mise à jour.</p>
+        <p className="empty-line">OnTrack se concentre d abord sur tes révisions. Le suivi financier arrive dans une prochaine mise à jour.</p>
       </section>
     </>
   )
@@ -933,6 +946,9 @@ function writeLocal<T>(key: string, value: T) {
   try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* quota */ }
 }
 
+/* ============================================================
+   MODALS
+   ============================================================ */
 function TaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (input: { title: string; subject?: string; priority?: string; estimatedMinutes?: number; dueAt?: string }) => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -947,7 +963,7 @@ function TaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (inpu
           dueAt: String(fd.get('due') ?? '') || undefined,
         })
       }}>
-        <div className="modal-head"><div><p className="eyebrow">Nouvelle action</p><h3>Ajouter une tâche</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
+        <div className="modal-head"><div><p className="eyebrow">Nouvelle action</p><h3>Ajouter une tache</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
         <label className="auth-field"><span>Titre</span><input name="title" autoFocus required placeholder="Ex. Revoir le chapitre 4" /></label>
         <label className="auth-field"><span>Matière</span><select name="subject" defaultValue="Mathématiques">{SUBJECTS.map((s) => <option key={s}>{s}</option>)}</select></label>
         <div className="modal-row">
@@ -997,14 +1013,14 @@ function PushModal({ onClose }: { onClose: () => void }) {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''),
     }).catch(() => null)
-    if (!sub) { setStatus('Impossible de s’abonner. Vérifie la clé VAPID.'); return }
+    if (!sub) { setStatus('Impossible de s abonner. Vérifie la clé VAPID.'); return }
     startTransition(async () => {
       const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sub),
       })
-      setStatus(res.ok ? 'Activées. Tu recevras les rappels d’examens.' : 'Erreur lors de l’enregistrement.')
+      setStatus(res.ok ? 'Activées. Tu recevras les rappels d examens.' : 'Erreur lors de l enregistrement.')
     })
   }
 
@@ -1012,7 +1028,7 @@ function PushModal({ onClose }: { onClose: () => void }) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="quick-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head"><div><p className="eyebrow">Notifications</p><h3>Activer les rappels</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
-        <p className="empty-line">OnTrack peut t’envoyer des notifications pour les fins de session de focus et les rappels d’examens. Aucune pub, jamais.</p>
+        <p className="empty-line">OnTrack peut t envoyer des notifications pour les fins de session de focus et les rappels d examens. Aucune pub, jamais.</p>
         <button className="primary-button modal-submit" onClick={enable} disabled={pending}>{pending ? 'Activation…' : 'Activer les notifications'}</button>
         {status && <p className="empty-line" role="status">{status}</p>}
       </div>
