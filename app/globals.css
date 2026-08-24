@@ -747,3 +747,310 @@ body.grid-on .grid-toggle .dot { background: #fff; }
   .quick-modal input, .quick-modal select { background: #20232b; color: #f4f5f7; }
   .crumb strong, .task-details strong, .agenda-row > div:nth-child(2) strong { color: #f4f5f7; }
 }
+
+/* ============================================================
+   Theme + accent overrides (apply to orbite dashboard + settings)
+   Marketing landing (Müller-Brockmann) is intentionally NOT
+   affected — it uses fixed Swiss-red vars and stays as-is.
+   Driven by data-theme and data-accent attribute on <html>.
+   ============================================================ */
+
+/* Accent palette — picked up via [data-accent="..."] on <html>.
+   Each block overrides --primary AND the hardcoded #ee705f values
+   used throughout the orbite dashboard CSS. */
+html[data-accent="coral"] {
+  --primary: #ee705f;
+  --primary-soft: #fcdcd5;
+}
+html[data-accent="indigo"] {
+  --primary: #5266b6;
+  --primary-soft: #dde3f5;
+}
+html[data-accent="emerald"] {
+  --primary: #5fb87e;
+  --primary-soft: #d6efe0;
+}
+html[data-accent="amber"] {
+  --primary: #d4a05a;
+  --primary-soft: #f4e6cf;
+}
+html[data-accent="violet"] {
+  --primary: #7d5fb8;
+  --primary-soft: #e3d8f1;
+}
+html[data-accent="rose"] {
+  --primary: #d85f8d;
+  --primary-soft: #f5d8e4;
+}
+
+/* Cascade accent into the orbite dashboard's hardcoded coral values.
+   We use attribute selectors so this only fires inside pages that
+   actually carry the orbite app shell (dashboard, settings). */
+html[data-accent]:not([data-accent="coral"]) .brand-mark,
+html[data-accent]:not([data-accent="coral"]) .welcome-row h1 span,
+html[data-accent]:not([data-accent="coral"]) .primary-button,
+html[data-accent]:not([data-accent="coral"]) .focus-button,
+html[data-accent]:not([data-accent="coral"]) .tutor-button,
+html[data-accent]:not([data-accent="coral"]) .modal-submit,
+html[data-accent]:not([data-accent="coral"]) .focus-icon,
+html[data-accent]:not([data-accent="coral"]) .progress-line span,
+html[data-accent]:not([data-accent="coral"]) .check-circle.checked,
+html[data-accent]:not([data-accent="coral"]) .exam-date strong,
+html[data-accent]:not([data-accent="coral"]) .exam-date,
+html[data-accent]:not([data-accent="coral"]) .days-badge,
+html[data-accent]:not([data-accent="coral"]) .streak strong,
+html[data-accent]:not([data-accent="coral"]) .bar.level-4,
+html[data-accent]:not([data-accent="coral"]) .bar.level-5,
+html[data-accent]:not([data-accent="coral"]) .agenda-tag.urgent,
+html[data-accent]:not([data-accent="coral"]) .coral-chip,
+html[data-accent]:not([data-accent="coral"]) .task-details small i {
+  background-color: var(--primary);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+html[data-accent]:not([data-accent="coral"]) .check-circle.checked,
+html[data-accent]:not([data-accent="coral"]) .days-badge,
+html[data-accent]:not([data-accent="coral"]) .primary-button,
+html[data-accent]:not([data-accent="coral"]) .focus-button,
+html[data-accent]:not([data-accent="coral"]) .tutor-button,
+html[data-accent]:not([data-accent="coral"]) .modal-submit {
+  color: #fff;
+}
+html[data-accent]:not([data-accent="coral"]) .exam-date {
+  background-color: var(--primary-soft);
+}
+html[data-accent]:not([data-accent="coral"]) .focus-banner {
+  background-color: var(--primary-soft);
+  border-color: var(--primary);
+}
+html[data-accent]:not([data-accent="coral"]) .agenda-tag.urgent {
+  background-color: var(--primary-soft);
+}
+html[data-accent]:not([data-accent="coral"]) .coral-chip {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Explicit dark theme — overrides media-query-driven dark mode so the
+   user choice sticks regardless of OS preference. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #17191f;
+  --foreground: #f4f5f7;
+  --card: #20232b;
+  --card-foreground: #f4f5f7;
+  --muted: #2a2d36;
+  --muted-foreground: #a4a8b5;
+  --border: #343844;
+}
+html[data-theme="dark"] .app-shell,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .topbar { background: #17191f; }
+html[data-theme="dark"] .sidebar { border-color: #2b2e38; }
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .search-pill,
+html[data-theme="dark"] .round-add,
+html[data-theme="dark"] .quick-modal { background: #20232b; border-color: #343844; }
+html[data-theme="dark"] .nav-item:hover,
+html[data-theme="dark"] .nav-item.active { background: #292c35; color: #f4f5f7; }
+html[data-theme="dark"] .nav-item { color: #a4a8b5; }
+html[data-theme="dark"] .task-row,
+html[data-theme="dark"] .agenda-row,
+html[data-theme="dark"] .panel-footer,
+html[data-theme="dark"] .week-bars { border-color: #30343e; }
+html[data-theme="dark"] .profile-card strong,
+html[data-theme="dark"] .panel-header h3,
+html[data-theme="dark"] .exam-date b,
+html[data-theme="dark"] .progress-label strong,
+html[data-theme="dark"] .streak strong,
+html[data-theme="dark"] .agenda-row strong,
+html[data-theme="dark"] .task-details strong,
+html[data-theme="dark"] .crumb strong,
+html[data-theme="dark"] .section-heading h2,
+html[data-theme="dark"] .panel h3 { color: #f4f5f7; }
+html[data-theme="dark"] .profile-card span,
+html[data-theme="dark"] .panel-header span,
+html[data-theme="dark"] .exam-date span,
+html[data-theme="dark"] .streak span,
+html[data-theme="dark"] .agenda-row span,
+html[data-theme="dark"] .task-details small,
+html[data-theme="dark"] .subhead,
+html[data-theme="dark"] .crumb,
+html[data-theme="dark"] .exam-meta,
+html[data-theme="dark"] .footer-note,
+html[data-theme="dark"] .panel-footer { color: #a4a8b5; }
+html[data-theme="dark"] .eyebrow { color: #a4a8b5; }
+html[data-theme="dark"] .panel { color: #f4f5f7; }
+html[data-theme="dark"] .exam-date strong,
+html[data-theme="dark"] .streak strong,
+html[data-theme="dark"] .welcome-row h1 span { color: var(--primary); }
+html[data-theme="dark"] .focus-banner {
+  background: #2b2222;
+  border-color: #543432;
+}
+html[data-theme="dark"] .focus-copy strong { color: #f4f5f7; }
+html[data-theme="dark"] .focus-copy span { color: #a4a8b5; }
+html[data-theme="dark"] .modal-head button { color: #a4a8b5; }
+html[data-theme="dark"] .quick-modal input,
+html[data-theme="dark"] .quick-modal select { background: #20232b; color: #f4f5f7; }
+
+/* ============================================================
+   Settings page
+   ============================================================ */
+.settings-page {
+  min-height: 100vh;
+  background: var(--paper, #fff);
+  color: var(--ink, #111315);
+  padding: 32px 24px 64px;
+  font-family: var(--font-sans);
+}
+.settings-header {
+  max-width: 720px;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-soft, #5b6066);
+  text-decoration: none;
+}
+.settings-back:hover { color: var(--ink, #111315); }
+.settings-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-soft, #5b6066);
+}
+.settings-shell {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.settings-title {
+  margin: 0 0 16px;
+  font-family: var(--font-instrument), 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.settings-intro {
+  margin: 0 0 40px;
+  color: var(--ink-soft, #5b6066);
+  font-size: 15px;
+  line-height: 24px;
+  max-width: 52ch;
+}
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+.settings-group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.settings-group-title {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-soft, #5b6066);
+  margin-bottom: 12px;
+  padding: 0;
+}
+.settings-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .settings-options { grid-template-columns: 1fr; }
+}
+.settings-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--rule, #d8dadd);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.settings-option:hover { border-color: #111315; }
+.settings-option.is-selected {
+  border-color: var(--primary, #ee705f);
+  background: rgba(238, 112, 95, 0.04);
+}
+.settings-option input { position: absolute; opacity: 0; pointer-events: none; }
+.settings-option-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink, #111315);
+}
+.settings-option-desc {
+  font-size: 12px;
+  color: var(--ink-soft, #5b6066);
+  line-height: 18px;
+}
+.settings-accents {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .settings-accents { grid-template-columns: repeat(3, 1fr); }
+}
+.settings-accent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  border: 1px solid var(--rule, #d8dadd);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+.settings-accent:hover { border-color: #111315; }
+.settings-accent.is-selected {
+  border-color: var(--primary, #ee705f);
+}
+.settings-accent input { position: absolute; opacity: 0; pointer-events: none; }
+.settings-accent-swatch {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+}
+.settings-accent .settings-option-label { font-size: 11px; }
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.settings-hint {
+  font-size: 12px;
+  color: var(--ink-soft, #5b6066);
+}
+
+/* Dark theme overrides for the settings page itself */
+html[data-theme="dark"] .settings-page { background: #17191f; color: #f4f5f7; }
+html[data-theme="dark"] .settings-option,
+html[data-theme="dark"] .settings-accent { background: #20232b; border-color: #343844; }
+html[data-theme="dark"] .settings-option-label,
+html[data-theme="dark"] .settings-accent .settings-option-label { color: #f4f5f7; }
+html[data-theme="dark"] .settings-option-desc,
+html[data-theme="dark"] .settings-intro,
+html[data-theme="dark"] .settings-eyebrow,
+html[data-theme="dark"] .settings-back,
+html[data-theme="dark"] .settings-hint { color: #a4a8b5; }
+html[data-theme="dark"] .settings-option:hover,
+html[data-theme="dark"] .settings-accent:hover { border-color: #f4f5f7; }
+html[data-theme="dark"] .settings-title { color: #f4f5f7; }
+html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255,255,255,0.1); }

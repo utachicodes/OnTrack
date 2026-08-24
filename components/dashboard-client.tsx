@@ -25,9 +25,10 @@ import {
   Target,
   Timer,
   TrendingUp,
-  WalletCards,
+  Settings as SettingsIcon,
   X,
 } from 'lucide-react'
+import Link from 'next/link'
 
 type Task = { id: number; title: string; subject: string; time: string; done: boolean; tone: string }
 
@@ -74,7 +75,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
           <button className="nav-item" onClick={() => setActiveNav('Habitudes')}><Flame size={18} /><span>Habitudes</span></button>
           <button className="nav-item" onClick={() => setActiveNav('Finances')}><WalletCards size={18} /><span>Finances</span></button>
         </nav>
-        <div className="sidebar-bottom"><button className="nav-item"><Bell size={18} /><span>Notifications</span><i /></button><button className="nav-item"><Command size={18} /><span>Raccourcis</span><kbd>⌘ K</kbd></button></div>
+        <div className="sidebar-bottom"><Link href="/settings" className="nav-item"><SettingsIcon size={18} /><span>Réglages</span></Link><button className="nav-item"><Bell size={18} /><span>Notifications</span><i /></button><button className="nav-item"><Command size={18} /><span>Raccourcis</span><kbd>⌘ K</kbd></button></div>
       </aside>
 
       <section className="workspace">

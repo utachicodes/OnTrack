@@ -1,9 +1,19 @@
-import { pgTable, text, timestamp, integer, boolean, uuid } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, integer, boolean, uuid, pgEnum } from 'drizzle-orm/pg-core'
+
+export const themePreferenceEnum = pgEnum('theme_preference', ['light', 'dark', 'system'])
+export const accentColorEnum = pgEnum('accent_color', ['coral', 'indigo', 'emerald', 'amber', 'violet', 'rose'])
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(), name: text('name').notNull(), email: text('email').notNull().unique(),
   emailVerified: boolean('emailVerified').notNull().default(false), image: text('image'),
   createdAt: timestamp('createdAt').notNull().defaultNow(), updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})
+
+export const userPreferences = pgTable('user_preferences', {
+  userId: text('user_id').primaryKey().references(() => user.id, { onDelete: 'cascade' }),
+  themePreference: themePreferenceEnum('theme_preference').notNull().default('system'),
+  accentColor: accentColorEnum('accent_color').notNull().default('coral'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 export const session = pgTable('session', {
   id: text('id').primaryKey(), expiresAt: timestamp('expiresAt').notNull(), token: text('token').notNull().unique(),
