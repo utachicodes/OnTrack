@@ -25,11 +25,11 @@ import {
   Target,
   Timer,
   TrendingUp,
+  WalletCards,
   Settings as SettingsIcon,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
-
 type Task = { id: number; title: string; subject: string; time: string; done: boolean; tone: string }
 
 const navItems = [

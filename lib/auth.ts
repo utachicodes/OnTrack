@@ -11,6 +11,20 @@ export const auth = betterAuth({
     origin(process.env.VERCEL_URL) ??
     process.env.V0_RUNTIME_URL,
   emailAndPassword: { enabled: true, autoSignIn: true },
+  // Rate limits: per-IP, default 100 req / 60s. Tighter custom rules for
+  // sign-in (10/60s) and sign-up (5/60s) to slow brute-force + account
+  // enumeration. Sign-out is exempt so legitimate logouts can't be blocked.
+  rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    customRules: {
+      '/sign-in/email': { window: 60, max: 10 },
+      '/sign-up/email': { window: 60, max: 5 },
+      '/forget-password': { window: 60, max: 5 },
+      '/reset-password': { window: 60, max: 5 },
+    },
+  },
   trustedOrigins: [
     ...(process.env.NODE_ENV === 'development'
       ? [
