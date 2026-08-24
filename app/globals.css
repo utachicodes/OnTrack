@@ -13,17 +13,8 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --font-sans: 'Inter', 'Geist', sans-serif;
-  --font-display: 'DM Sans', 'Inter', sans-serif;
-  --font-instrument: var(--font-instrument), 'Instrument Serif', Georgia, serif;
-  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-overlay: cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-:root {
-  color-scheme: light;
-  --background: #f5f6f8;
+  --font-sans: var(--font-jakarta), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-jakarta), 'Inter', system-ui, sans-serif;
   --foreground: #252938;
   --card: #ffffff;
   --card-foreground: #252938;
@@ -550,6 +541,7 @@ button { cursor: pointer; }
   .lower-grid { grid-template-columns: 1fr; }
 }
 
+ /* Dark-mode media block intentionally disabled — see comment. */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
@@ -570,6 +562,7 @@ button { cursor: pointer; }
   .quick-modal input, .quick-modal select { background: #20232b; color: #f4f5f7; }
   .crumb strong, .task-details strong, .agenda-row > div:nth-child(2) strong { color: #f4f5f7; }
 }
+*/
 
 /* ============================================================
    Theme + accent overrides (apply to orbite dashboard + settings)
@@ -1531,31 +1524,29 @@ html[data-theme="dark"] .legal-foot { color: #7d8291; border-top-color: #2b2e38;
     top: 0;
     left: 0;
     height: 100dvh;
+    height: 100dvh;
     z-index: 40;
     transform: translateX(-100%);
     transition: transform 220ms ease;
     width: 252px;
   }
-  .sidebar.is-open { transform: translateX(0); }
 }
-
-/* Install banner */
-.install-banner {
-  display: flex;
+/* Install pill — small subtle dismissable pill in the topbar. */
+.install-pill {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 16px 44px 0;
-  padding: 14px 18px;
-  border: 1px solid var(--primary, #ee705f);
-  border-radius: 14px;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
   background: var(--primary-soft, #fff5f3);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease;
 }
-.install-banner strong { display: block; font-size: 13px; }
-.install-banner span { display: block; font-size: 11px; color: var(--muted-foreground, #7d8291); }
-@media (max-width: 720px) {
-  .install-banner { margin: 16px 17px 0; flex-direction: column; align-items: stretch; }
-}
+.install-pill:hover { transform: translateY(-1px); background: #fff; }
 
 /* Pomodoro ring */
 .pomodoro {

@@ -12,15 +12,17 @@ import { eq } from 'drizzle-orm'
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-sans',
+  variable: '--font-jakarta',
   weight: ['400', '500', '600', '700', '800'],
 })
+
 const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
   display: 'swap',
   variable: '--font-mono',
 })
+
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
@@ -38,31 +40,25 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'OnTrack',
   },
   icons: {
-    icon: [
-      { url: '/logo.png', sizes: 'any', type: 'image/png' },
-      { url: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
+    icon: [{ url: '/logo.png', sizes: 'any', type: 'image/png' }],
     apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
   },
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f1115' },
-  ],
+  colorScheme: 'light',
+  themeColor: [{ media: '(prefers-color-scheme: light)', color: '#ffffff' }],
   width: 'device-width',
   initialScale: 1,
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession()
-  // Always default to LIGHT theme. Dark is opt-in via Réglages.
+  // Default to LIGHT. Only flip to dark if user explicitly chose dark.
   let themePreference: 'light' | 'dark' = 'light'
   let accentColor: string = 'coral'
 
@@ -73,7 +69,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       .where(eq(userPreferences.userId, session.user.id))
       .limit(1)
     if (rows[0]) {
-      // Only honor saved theme if user explicitly chose dark; ignore 'system'.
       themePreference = rows[0].themePreference === 'dark' ? 'dark' : 'light'
       accentColor = rows[0].accentColor
     }

@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, exams, focusSessions } from '@/lib/db/schema'
 import { DashboardClient } from '@/components/dashboard-client'
+import { seedStarterContent } from '@/app/actions/seed'
 
 export const metadata = {
   title: 'Tableau de bord · OnTrack',
@@ -12,6 +13,9 @@ export const metadata = {
 export default async function DashboardPage() {
   const session = await getSession()
   if (!session?.user) redirect('/sign-in')
+
+  // Seed example tasks/exams if the user has none, and force light theme.
+  await seedStarterContent()
 
   const userId = session.user.id
   const now = new Date()
