@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Pause, Play, RotateCcw } from 'lucide-react'
+import { IconCheck, IconReset, IconHourglass } from '@/components/icons'
 import { startFocusSession, completeFocusSession } from '@/app/actions/focus'
 
 interface FocusSessionRow {
@@ -76,7 +76,7 @@ export function Pomodoro({ defaultMinutes = 25 }: { defaultMinutes?: number }) {
         })
       }
     } catch {
-      /* notifications disabled or unsupported */
+      /* notifications disabled */
     }
   }
 
@@ -94,22 +94,22 @@ export function Pomodoro({ defaultMinutes = 25 }: { defaultMinutes?: number }) {
       <div className="pomodoro-actions">
         {!active && (
           <button className="primary-button" onClick={start}>
-            <Play size={16} fill="currentColor" /> Démarrer {defaultMinutes} min
+            <IconHourglass size={16} /> Démarrer {defaultMinutes} min
           </button>
         )}
         {active && (
           <button className="primary-button" onClick={() => finish('completed')}>
-            <Pause size={16} /> Terminer
+            <IconCheck size={16} /> Terminer
           </button>
         )}
         {active && (
           <button className="ghost-button" onClick={() => finish('cancelled')}>
-            <RotateCcw size={15} /> Annuler
+            <IconReset size={15} /> Annuler
           </button>
         )}
       </div>
       <p className="pomodoro-meta">
-        <strong>{completed}</strong> session{completed > 1 ? 's' : ''} terminée{completed > 1 ? 's' : ''} aujourd’hui
+        <strong>{completed}</strong> session{completed > 1 ? 's' : ''} terminée{completed > 1 ? 's' : ''} aujourd&rsquo;hui
       </p>
     </div>
   )

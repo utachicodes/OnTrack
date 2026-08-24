@@ -3,31 +3,34 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import {
-  ArrowUpRight,
-  Bell,
-  BookOpen,
-  CalendarDays,
-  Check,
-  ChevronRight,
-  Clock3,
-  Command,
-  FileText,
-  Flame,
-  Focus,
-  GraduationCap,
-  LayoutDashboard,
-  Menu,
-  MoreHorizontal,
-  Plus,
-  Search,
-  Settings as SettingsIcon,
-  Sparkles,
-  Target,
-  Timer,
-  TrendingUp,
-  WalletCards,
-  X,
-} from 'lucide-react'
+  IconOverview,
+  IconLearn,
+  IconExams,
+  IconTasks,
+  IconPlanning,
+  IconFocus,
+  IconDocs,
+  IconGoals,
+  IconHabits,
+  IconFinance,
+  IconSettings,
+  IconBell,
+  IconSearch,
+  IconAdd,
+  IconChevron,
+  IconMenu,
+  IconClose,
+  IconSparkles,
+  IconTimer,
+  IconFlame,
+  IconArrow,
+  IconCheck,
+  IconTrending,
+  IconSend,
+  IconHourglass,
+  IconReset,
+} from '@/components/icons'
+import { BrandMark } from '@/components/brand-mark'
 import { createTask, toggleTask, deleteTask } from '@/app/actions/tasks'
 import { createExam, updateExamProgress, deleteExam } from '@/app/actions/exams'
 import { Pomodoro } from '@/components/pomodoro'
@@ -62,21 +65,48 @@ const SUBJECTS = ['Mathématiques', 'Physique', 'Français', 'Histoire', 'Philos
 
 type NavKey = 'overview' | 'tasks' | 'exams' | 'planning' | 'focus' | 'learn' | 'documents' | 'goals' | 'habits' | 'finance'
 
-function formatDue(iso: string | null): { label: string; urgent: boolean } {
-  if (!iso) return { label: 'Pas d’échéance', urgent: false }
+interface NavItem {
+  key: NavKey
+  label: string
+  icon: (p: { size?: number }) => JSX.Element
+  accent: string
+  group: 'work' | 'me'
+}
+
+const NAV: NavItem[] = [
+  { key: 'overview', label: "Vue d'ensemble", icon: IconOverview, accent: '#ee705f', group: 'work' },
+  { key: 'learn', label: 'Apprendre', icon: IconLearn, accent: '#5266b6', group: 'work' },
+  { key: 'exams', label: 'Examens', icon: IconExams, accent: '#d4a05a', group: 'work' },
+  { key: 'tasks', label: 'Tâches', icon: IconTasks, accent: '#5fb87e', group: 'work' },
+  { key: 'planning', label: 'Planning', icon: IconPlanning, accent: '#7d5fb8', group: 'work' },
+  { key: 'focus', label: 'Focus', icon: IconFocus, accent: '#ee705f', group: 'work' },
+  { key: 'documents', label: 'Bibliothèque', icon: IconDocs, accent: '#d4a05a', group: 'work' },
+  { key: 'goals', label: 'Objectifs', icon: IconGoals, accent: '#ee705f', group: 'me' },
+  { key: 'habits', label: 'Habitudes', icon: IconHabits, accent: '#ff8a76', group: 'me' },
+  { key: 'finance', label: 'Finances', icon: IconFinance, accent: '#7d5fb8', group: 'me' },
+]
+
+function formatDue(iso: string | null): { label: string; urgent: boolean; color: string } {
+  if (!iso) return { label: 'Pas d’échéance', urgent: false, color: '#7d8291' }
   const d = new Date(iso)
   const now = new Date()
   const diff = Math.round((d.getTime() - now.getTime()) / 86400000)
   const date = d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
-  if (diff < 0) return { label: `En retard · ${date}`, urgent: true }
-  if (diff === 0) return { label: `Aujourd’hui · ${date}`, urgent: true }
-  if (diff === 1) return { label: `Demain · ${date}`, urgent: true }
-  if (diff <= 7) return { label: `Dans ${diff} j · ${date}`, urgent: false }
-  return { label: date, urgent: false }
+  if (diff < 0) return { label: `En retard · ${date}`, urgent: true, color: '#d8553f' }
+  if (diff === 0) return { label: `Aujourd’hui · ${date}`, urgent: true, color: '#ee705f' }
+  if (diff === 1) return { label: `Demain · ${date}`, urgent: true, color: '#ee705f' }
+  if (diff <= 7) return { label: `Dans ${diff} j · ${date}`, urgent: false, color: '#5b6066' }
+  return { label: date, urgent: false, color: '#5b6066' }
 }
 
 function daysUntil(iso: string): number {
   return Math.max(0, Math.round((new Date(iso).getTime() - Date.now()) / 86400000))
+}
+
+function accentClass(p: Task['priority']): string {
+  if (p === 'low') return 'pill-emerald'
+  if (p === 'medium') return 'pill-amber'
+  return 'pill-coral'
 }
 
 export function DashboardClient({ userName, initialTasks, initialExams, focusThisWeek }: DashboardProps) {
@@ -86,90 +116,173 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
   const [nav, setNav] = useState<NavKey>('overview')
   const [tasks, setTasks] = useState(initialTasks)
   const [exams, setExams] = useState(initialExams)
-  const [showQuickAdd, setShowQuickAdd] = useState<TaskKind | null>(null)
-  const [showSidebar, setShowSidebar] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+  const [modal, setModal] = useState<TaskKind | null>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [showPush, setShowPush] = useState(false)
-  const [installAvailable, setInstallAvailable] = useState(false)
+  const [showInstallPill, setShowInstallPill] = useState(false)
+  const [activeBadge, setActiveBadge] = useState<NavKey | null>(null)
 
   useEffect(() => {
-    const handler = (e: Event) => {
+    if (typeof window === 'undefined') return
+    setCollapsed(localStorage.getItem('ontrack.sidebar.collapsed') !== 'false')
+    const deferred = (e: Event) => {
       e.preventDefault()
-      setInstallAvailable(true)
+      window.deferredInstallPrompt = e
+      setTimeout(() => setShowInstallPill(true), 2500)
     }
-    window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    window.addEventListener('beforeinstallprompt', deferred)
+    return () => window.removeEventListener('beforeinstallprompt', deferred)
   }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ontrack.sidebar.collapsed', collapsed ? '1' : '0')
+    }
+  }, [collapsed])
 
   const completed = useMemo(() => tasks.filter((t) => t.status === 'done').length, [tasks])
   const nextExam = exams[0]
-  const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const todayLabel = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase())
   const timeLabel = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 
+  const badgesByKey = useMemo(() => {
+    const m: Partial<Record<NavKey, number>> = {}
+    m.tasks = tasks.filter((t) => t.status === 'todo').length
+    m.exams = exams.length
+    m.learn = 4
+    return m
+  }, [tasks, exams])
+
   return (
-    <main className="app-shell">
-      <aside className={`sidebar ${showSidebar ? 'is-open' : ''}`}>
-        <div className="brand"><div className="brand-mark"><Sparkles size={16} /></div><span>OnTrack</span></div>
+    <main className={`app-shell ${collapsed ? 'is-rail' : 'is-expanded'}`}>
+      <aside className={`sidebar ${mobileOpen ? 'is-mobile-open' : ''}`}>
+        <button
+          className="rail-toggle"
+          onClick={() => setCollapsed((c) => !c)}
+          aria-label={collapsed ? 'Étendre le menu' : 'Réduire le menu'}
+        >
+          {collapsed ? <IconMenu size={16} /> : <IconClose size={16} />}
+        </button>
+
+        <Link href="/dashboard" className="brand" aria-label="OnTrack · Utachi Industries">
+          <BrandMark height={collapsed ? 24 : 28} variant={collapsed ? 'mark' : 'full'} priority />
+        </Link>
+
         <div className="profile-card">
           <div className="avatar">{initials}</div>
-          <div><strong>{userName}</strong><span>Terminale · BAC 2026</span></div>
-          <MoreHorizontal size={18} />
+          {!collapsed && (
+            <div className="profile-meta">
+              <strong>{userName}</strong>
+              <span>Terminale · BAC 2026</span>
+            </div>
+          )}
         </div>
-        <nav className="nav-list" aria-label="Navigation principale">
-          <p className="nav-label">Espace de travail</p>
-          <NavButton id="overview" label="Vue d’ensemble" icon={LayoutDashboard} active={nav} onSelect={setNav} />
-          <NavButton id="learn" label="Apprendre" icon={BookOpen} active={nav} onSelect={setNav} badge={4} />
-          <NavButton id="exams" label="Examens" icon={GraduationCap} active={nav} onSelect={setNav} badge={exams.length} />
-          <NavButton id="tasks" label="Tâches" icon={Check} active={nav} onSelect={setNav} badge={tasks.filter((t) => t.status === 'todo').length} />
-          <NavButton id="planning" label="Planning" icon={CalendarDays} active={nav} onSelect={setNav} />
-          <NavButton id="focus" label="Focus" icon={Focus} active={nav} onSelect={setNav} />
-          <NavButton id="documents" label="Connaissances" icon={FileText} active={nav} onSelect={setNav} />
 
-          <p className="nav-label second">Personnel</p>
-          <NavButton id="goals" label="Objectifs" icon={Target} active={nav} onSelect={setNav} />
-          <NavButton id="habits" label="Habitudes" icon={Flame} active={nav} onSelect={setNav} />
-          <NavButton id="finance" label="Finances" icon={WalletCards} active={nav} onSelect={setNav} />
-        </nav>
+        <nav className="nav-list" aria-label="Navigation principale">
+          {!collapsed && <p className="nav-label">Espace de travail</p>}
+          {NAV.filter((n) => n.group === 'work').map((item) => (
+            <NavButton
+              key={item.key}
+              item={item}
+              collapsed={collapsed}
+              active={nav === item.key}
+              badge={badgesByKey[item.key] ?? 0}
+              onSelect={() => { setNav(item.key); setMobileOpen(false) }}
+            />
+          ))}
+          {!collapsed && <p className="nav-label second">Personnel</p>}
+          {NAV.filter((n) => n.group === 'me').map((item) => (
+            <NavButton
+              key={item.key}
+              item={item}
+              collapsed={collapsed}
+              active={nav === item.key}
+              onSelect={() => { setNav(item.key); setMobileOpen(false) }}
+            />
+          ))}
+          {!collapsed && <p className="nav-label second">Outils</p>}
+          <SidebarLink href="/flashcards" icon={<IconLearn size={16} />} label="Flashcards" collapsed={collapsed} />
+          <SidebarLink href="/examen-blanc" icon={<IconExams size={16} />} label="Examen blanc" collapsed={collapsed} />
+         </nav>
+
         <div className="sidebar-bottom">
-          <Link href="/settings" className="nav-item"><SettingsIcon size={18} /><span>Réglages</span></Link>
-          <button className="nav-item" onClick={() => setShowPush(true)}><Bell size={18} /><span>Notifications</span><i /></button>
-          <button className="nav-item" onClick={() => installAvailable && window.dispatchEvent(new Event('show-install'))}><Command size={18} /><span>Installer l’app</span></button>
+          <SidebarLink href="/settings" icon={<IconSettings size={16} />} label="Réglages" collapsed={collapsed} />
+          <button className="nav-item" onClick={() => setShowPush(true)}>
+            <span className="nav-icon"><IconBell size={16} /></span>
+            {!collapsed && <span>Notifications</span>}
+            {!collapsed && <i className="dot" />}
+            {collapsed && <span className="sr-only">Notifications</span>}
+          </button>
+          <button
+            className="nav-item"
+            onClick={async () => {
+              const prompt = window.deferredInstallPrompt
+              if (!prompt) return
+              await prompt.prompt()
+              try { await prompt.userChoice } catch { /* ignore */ }
+              window.deferredInstallPrompt = undefined
+              setShowInstallPill(false)
+            }}
+          >
+            <span className="nav-icon"><IconSparkles size={16} /></span>
+            {!collapsed && <span>Installer</span>}
+          </button>
         </div>
       </aside>
 
       <section className="workspace">
         <header className="topbar">
-          <button className="mobile-menu" onClick={() => setShowSidebar((v) => !v)} aria-label="Ouvrir le menu">
-            {showSidebar ? <X size={20} /> : <Menu size={20} />}
+          <button className="mobile-menu" onClick={() => setMobileOpen((v) => !v)} aria-label="Menu">
+            {mobileOpen ? <IconClose size={18} /> : <IconMenu size={18} />}
           </button>
-          <div className="crumb"><span>Mon espace</span><ChevronRight size={14} /><strong>{NAV_LABEL[nav]}</strong></div>
+          <div className="crumb">
+            <span className="crumb-emoji">✦</span>
+            <span>Mon espace</span>
+            <IconChevron size={12} />
+            <strong>{NAV.find((n) => n.key === nav)?.label}</strong>
+          </div>
           <div className="top-actions">
-            <button className="search-pill"><Search size={16} /><span>Rechercher</span><kbd>⌘ K</kbd></button>
-            <button className="icon-button" aria-label="Notifications" onClick={() => setShowPush(true)}><Bell size={18} /><i /></button>
+            <button className="search-pill">
+              <IconSearch size={14} />
+              <span>Rechercher</span>
+              <kbd>⌘K</kbd>
+            </button>
+            <button className="icon-button" aria-label="Notifications" onClick={() => setShowPush(true)}>
+              <IconBell size={16} />
+              <i className="dot" />
+            </button>
             <div className="mini-avatar">{initials}</div>
           </div>
         </header>
 
-        {installAvailable && (
-          <div className="install-banner">
-            <div>
-              <strong>Installe OnTrack sur ton téléphone</strong>
-              <span>Travaille hors-ligne, reçois les rappels d’examens, ouvre l’app en un geste.</span>
-            </div>
-            <button className="primary-button" onClick={() => window.dispatchEvent(new Event('show-install'))}>
-              Installer
-            </button>
-          </div>
+        {showInstallPill && (
+          <button
+            className="install-pill"
+            onClick={async () => {
+              const prompt = window.deferredInstallPrompt
+              if (!prompt) { setShowInstallPill(false); return }
+              await prompt.prompt()
+              try { await prompt.userChoice } catch { /* ignore */ }
+              window.deferredInstallPrompt = undefined
+              setShowInstallPill(false)
+            }}
+          >
+            <IconSparkles size={14} />
+            <span>Installer OnTrack sur ton téléphone</span>
+            <IconArrow size={12} />
+          </button>
         )}
 
         <div className="content">
           <div className="welcome-row">
             <div>
-              <p className="eyebrow">{todayLabel} · {timeLabel}</p>
-              <h1>Bonjour {firstName}<span>.</span></h1>
+              <p className="eyebrow"><span className="dot-coral" /> {todayLabel} · {timeLabel}</p>
+              <h1>Bonjour {firstName}<span className="wave">.</span></h1>
               <p className="subhead">Une nouvelle journée pour avancer sereinement vers ton BAC.</p>
             </div>
-            <button className="primary-button" onClick={() => setShowQuickAdd('task')}>
-              <Plus size={17} /> Ajouter une tâche
+            <button className="primary-button" onClick={() => setModal('task')}>
+              <IconAdd size={16} /> Ajouter une tâche
             </button>
           </div>
 
@@ -181,8 +294,8 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
               const updated = await toggleTask(id)
               setTasks((cur) => cur.map((t) => t.id === id ? { ...t, status: updated.status as 'todo' | 'done' } : t))
             }}
-            onAddTask={() => setShowQuickAdd('task')}
-            onAddExam={() => setShowQuickAdd('exam')}
+            onAddTask={() => setModal('task')}
+            onAddExam={() => setModal('exam')}
           />}
 
           {nav === 'tasks' && <TasksView tasks={tasks}
@@ -194,7 +307,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
               await deleteTask(id)
               setTasks((cur) => cur.filter((t) => t.id !== id))
             }}
-            onAdd={() => setShowQuickAdd('task')} />}
+            onAdd={() => setModal('task')} />}
 
           {nav === 'exams' && <ExamsView exams={exams}
             onProgress={async (id, p) => {
@@ -205,7 +318,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
               await deleteExam(id)
               setExams((cur) => cur.filter((e) => e.id !== id))
             }}
-            onAdd={() => setShowQuickAdd('exam')} />}
+            onAdd={() => setModal('exam')} />}
 
           {nav === 'planning' && <PlanningView exams={exams} tasks={tasks} />}
           {nav === 'focus' && <FocusView thisWeek={focusThisWeek} />}
@@ -214,73 +327,73 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
           {nav === 'goals' && <GoalsView />}
           {nav === 'habits' && <HabitsView thisWeek={focusThisWeek} />}
           {nav === 'finance' && <FinanceView />}
-
-          <footer className="footer-note">
-            <span>OnTrack · Ton espace pour avancer.</span>
-            <span>Dernière synchronisation à l’instant</span>
-          </footer>
         </div>
       </section>
 
-      {showQuickAdd === 'task' && <TaskModal onClose={() => setShowQuickAdd(null)} onCreate={async (input) => {
+      {modal === 'task' && <TaskModal onClose={() => setModal(null)} onCreate={async (input) => {
         const task = await createTask(input)
         setTasks((cur) => [...cur, {
           id: task.id, title: task.title, subject: task.subject ?? 'Général',
           estimatedMinutes: task.estimatedMinutes, priority: task.priority as 'low' | 'medium' | 'high',
           status: task.status as 'todo' | 'done', dueAt: task.dueAt ? task.dueAt.toISOString() : null,
         }])
-        setShowQuickAdd(null)
+        setModal(null)
       }} />}
 
-      {showQuickAdd === 'exam' && <ExamModal onClose={() => setShowQuickAdd(null)} onCreate={async (input) => {
+      {modal === 'exam' && <ExamModal onClose={() => setModal(null)} onCreate={async (input) => {
         const exam = await createExam(input)
         setExams((cur) => [...cur, {
           id: exam.id, title: exam.title, subject: exam.subject,
           examAt: exam.examAt.toISOString(), preparationPercent: exam.preparationPercent,
         }])
-        setShowQuickAdd(null)
+        setModal(null)
       }} />}
 
       {showPush && <PushModal onClose={() => setShowPush(false)} />}
-      {showSidebar && <div className="sidebar-backdrop" onClick={() => setShowSidebar(false)} />}
+      {mobileOpen && <div className="sidebar-backdrop" onClick={() => setMobileOpen(false)} />}
     </main>
   )
-}
-
-const NAV_LABEL: Record<NavKey, string> = {
-  overview: 'Vue d’ensemble',
-  tasks: 'Tâches',
-  exams: 'Examens',
-  planning: 'Planning',
-  focus: 'Focus',
-  learn: 'Apprendre',
-  documents: 'Connaissances',
-  goals: 'Objectifs',
-  habits: 'Habitudes',
-  finance: 'Finances',
 }
 
 type TaskKind = 'task' | 'exam'
 
 interface NavButtonProps {
-  id: NavKey
-  label: string
-  icon: React.ComponentType<{ size?: number }>
-  active: NavKey
-  onSelect: (id: NavKey) => void
+  item: NavItem
+  collapsed: boolean
+  active: boolean
   badge?: number
+  onSelect: () => void
 }
 
-function NavButton({ id, label, icon: Icon, active, onSelect, badge }: NavButtonProps) {
+function NavButton({ item, collapsed, active, badge, onSelect }: NavButtonProps) {
+  const Icon = item.icon
   return (
-    <button className={`nav-item ${active === id ? 'active' : ''}`} onClick={() => onSelect(id)}>
-      <Icon size={18} /><span>{label}</span>
-      {badge !== undefined && badge > 0 ? <em>{badge}</em> : null}
+    <button
+      className={`nav-item ${active ? 'is-active' : ''}`}
+      onClick={onSelect}
+      style={{ ['--nav-accent' as string]: item.accent } as React.CSSProperties}
+      title={collapsed ? item.label : undefined}
+    >
+      <span className="nav-icon"><Icon size={18} /></span>
+      {!collapsed && <span className="nav-label-text">{item.label}</span>}
+      {!collapsed && badge !== undefined && badge > 0 ? <em className="nav-badge">{badge}</em> : null}
+      {collapsed && badge !== undefined && badge > 0 ? <span className="nav-badge-pill">{badge}</span> : null}
     </button>
   )
 }
 
-/* ---------- Overview ---------- */
+function SidebarLink({ href, icon, label, collapsed }: { href: string; icon: React.ReactNode; label: string; collapsed: boolean }) {
+  return (
+    <Link href={href} className="nav-item" title={collapsed ? label : undefined}>
+      <span className="nav-icon">{icon}</span>
+      {!collapsed && <span className="nav-label-text">{label}</span>}
+    </Link>
+  )
+}
+
+/* ============================================================
+   OVERVIEW — viewport-fit, no scroll
+   ============================================================ */
 interface OverviewProps {
   tasks: Task[]
   completed: number
@@ -292,89 +405,166 @@ interface OverviewProps {
   onAddExam: () => void
 }
 function OverviewView({ tasks, completed, exams, nextExam, focusThisWeek, onTaskToggle, onAddTask, onAddExam }: OverviewProps) {
+  const recent = tasks.slice(0, 5)
   return (
-    <>
-      <div className="section-heading"><div><p className="eyebrow">Aujourd’hui</p><h2>Ton attention, au bon endroit</h2></div></div>
-      <div className="dashboard-grid">
-        <section className="panel tasks-panel">
-          <div className="panel-header"><div><h3>Tâches du jour</h3><span>{completed} sur {tasks.length} terminées</span></div><button className="round-add" onClick={onAddTask} aria-label="Ajouter"><Plus size={17} /></button></div>
-          <div className="progress-line"><span style={{ width: `${tasks.length ? (completed / tasks.length) * 100 : 0}%` }} /></div>
-          <div className="task-list">
-            {tasks.slice(0, 6).map((task) => {
-              const due = formatDue(task.dueAt)
-              return (
-                <button className={`task-row ${task.status === 'done' ? 'done' : ''}`} key={task.id} onClick={() => onTaskToggle(task.id)}>
-                  <span className={`check-circle ${task.status === 'done' ? 'checked' : ''}`}>{task.status === 'done' && <Check size={12} />}</span>
-                  <span className="task-details"><strong>{task.title}</strong><small><i className={toneClass(task.priority)} />{task.subject}</small></span>
-                  <span className={`task-time ${due.urgent ? 'urgent' : ''}`}><Clock3 size={14} />{due.label}</span>
-                </button>
-              )
-            })}
-            {tasks.length === 0 && <p className="empty">Aucune tâche. Clique sur <strong>Ajouter une tâche</strong> pour commencer.</p>}
-          </div>
-        </section>
+    <div className="overview-grid">
+      <section className="panel hero-panel">
+        <div className="hero-head">
+          <span className="kicker"><IconSparkles size={13} /> Aujourd’hui</span>
+          <span className="kicker-meta"><IconHourglass size={12} /> {focusThisWeek} sessions cette semaine</span>
+        </div>
+        <h2>Ton attention, au bon endroit.</h2>
+        <p className="hero-sub">Tu as <strong>{tasks.filter((t) => t.status === 'todo').length} tâche{tasks.filter((t) => t.status === 'todo').length > 1 ? 's' : ''}</strong> en cours et <strong>{exams.length} examen{exams.length > 1 ? 's' : ''}</strong> à préparer. Continue.</p>
+        <div className="progress-line"><span style={{ width: `${tasks.length ? (completed / tasks.length) * 100 : 0}%` }} /></div>
+        <div className="hero-meta">
+          <span><IconCheck size={13} /> {completed} terminées</span>
+          <span><IconTimer size={13} /> {tasks.reduce((s, t) => s + (t.status === 'done' ? 0 : t.estimatedMinutes), 0)} min restantes</span>
+        </div>
+      </section>
 
-        <section className="panel exam-panel">
-          <div className="panel-header"><div><h3>Prochain examen</h3><span>{nextExam ? nextExam.subject : '—'}</span></div>{nextExam && <span className="days-badge">J−{daysUntil(nextExam.examAt)}</span>}</div>
-          {nextExam ? (
-            <>
-              <div className="exam-date">
-                <strong>{new Date(nextExam.examAt).getDate()}</strong>
-                <div><span>{new Date(nextExam.examAt).toLocaleDateString('fr-FR', { month: 'short' }).toUpperCase()}</span><b>{new Date(nextExam.examAt).getFullYear()}</b></div>
-              </div>
-              <div className="exam-progress">
-                <div className="progress-label"><span>Préparation globale</span><strong>{nextExam.preparationPercent}%</strong></div>
-                <div className="progress-line"><span style={{ width: `${nextExam.preparationPercent}%` }} /></div>
-              </div>
-              <div className="exam-meta"><span><Check size={14} /> {nextExam.title}</span><span><Timer size={14} /> Écrit</span></div>
-            </>
-          ) : (
-            <div className="empty-state">
-              <p>Aucun examen enregistré.</p>
-              <button className="panel-footer" onClick={onAddExam}>Ajouter un examen <ArrowUpRight size={14} /></button>
+      <section className="panel tasks-panel">
+        <header className="panel-header">
+          <div>
+            <p className="eyebrow">À faire</p>
+            <h3>Tâches du jour</h3>
+          </div>
+          <button className="round-add" onClick={onAddTask} aria-label="Ajouter une tâche"><IconAdd size={16} /></button>
+        </header>
+        <div className="task-list compact">
+          {recent.map((task) => {
+            const due = formatDue(task.dueAt)
+            return (
+              <button className={`task-row ${task.status === 'done' ? 'is-done' : ''}`} key={task.id} onClick={() => onTaskToggle(task.id)}>
+                <span className={`check-circle ${task.status === 'done' ? 'is-checked' : ''}`}>
+                  {task.status === 'done' && <IconCheck size={10} />}
+                </span>
+                <div className="task-body">
+                  <strong>{task.title}</strong>
+                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> · {task.estimatedMinutes} min</small>
+                </div>
+                <span className="task-due" style={{ color: due.color }}>{due.label}</span>
+              </button>
+            )
+          })}
+          {recent.length === 0 && (
+            <div className="empty">
+              <IconSparkles size={20} />
+              <p>Aucune tâche. <button onClick={onAddTask}>Ajouter une première</button>.</p>
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-        <section className="panel habit-panel">
-          <div className="panel-header"><div><h3>Régularité</h3><span>Ton rythme cette semaine</span></div><TrendingUp size={19} className="trend" /></div>
-          <div className="streak"><strong>{focusThisWeek}</strong><span>sessions<br />de focus<br />terminées</span><Flame size={28} /></div>
-          <div className="week-bars">{['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => <div key={`${day}-${i}`}><span className={`bar level-${Math.min(5, Math.max(0, focusThisWeek > 0 ? (i < focusThisWeek ? (i % 5) + 1 : 0) : 0))}`} /><small>{day}</small></div>)}</div>
-        </section>
-      </div>
-
-      <div className="lower-grid">
-        <section className="panel agenda-panel">
-          <div className="panel-header"><div><h3>Prochaines échéances</h3><span>Les dates qui comptent</span></div></div>
-          {exams.slice(0, 4).map((exam) => {
-            const date = new Date(exam.examAt)
-            const days = daysUntil(exam.examAt)
+      <section className="panel focus-card">
+        <header className="panel-header">
+          <div>
+            <p className="eyebrow"><IconFlame size={11} /> Régularité</p>
+            <h3>Focus cette semaine</h3>
+          </div>
+          <IconTrending size={18} className="trend-icon" />
+        </header>
+        <div className="streak">
+          <strong>{focusThisWeek}</strong>
+          <span>sessions<br />complétées</span>
+          <div className="streak-flame"><IconFlame size={28} /></div>
+        </div>
+        <div className="week-bars">
+          {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, i) => {
+            const fill = i < focusThisWeek ? Math.min(5, (i % 5) + 1) : 0
             return (
-              <div className="agenda-row" key={exam.id}>
-                <div className={`date-chip ${days <= 7 ? 'urgent' : ''}`}><strong>{date.getDate()}</strong><span>{date.toLocaleDateString('fr-FR', { month: 'short' }).toUpperCase()}</span></div>
-                <div><strong>{exam.title}</strong><span>{exam.subject} · {exam.preparationPercent}% prêt</span></div>
-                <span className={`agenda-tag ${days <= 7 ? 'urgent' : ''}`}>{days <= 1 ? `Demain` : days === 0 ? 'Aujourd’hui' : `J−${days}`}</span>
+              <div key={`${day}-${i}`}>
+                <span className={`bar level-${fill}`} />
+                <small>{day}</small>
               </div>
             )
           })}
-          {exams.length === 0 && <p className="empty">Aucun examen planifié.</p>}
-        </section>
+        </div>
+        <Link href="#" onClick={(e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent('nav:focus')) }} className="panel-footer">
+          Démarrer une session <IconArrow size={13} />
+        </Link>
+      </section>
 
-        <section className="panel tutor-panel-card">
-          <AITutorPanel />
-        </section>
-      </div>
-    </>
+      <section className="panel exam-panel">
+        <header className="panel-header">
+          <div>
+            <p className="eyebrow">À surveiller</p>
+            <h3>Prochain examen</h3>
+          </div>
+          {nextExam && <span className="days-badge">J−{daysUntil(nextExam.examAt)}</span>}
+        </header>
+        {nextExam ? (
+          <>
+            <div className="exam-card-mini">
+              <div className="exam-date-block">
+                <strong>{new Date(nextExam.examAt).getDate()}</strong>
+                <div>
+                  <span>{new Date(nextExam.examAt).toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase()}</span>
+                  <b>{new Date(nextExam.examAt).getFullYear()}</b>
+                </div>
+              </div>
+              <div className="exam-body">
+                <strong>{nextExam.title}</strong>
+                <small>{nextExam.subject}</small>
+              </div>
+            </div>
+            <div className="progress-row">
+              <span>Préparation</span>
+              <div className="progress-line thin"><span style={{ width: `${nextExam.preparationPercent}%` }} /></div>
+              <strong>{nextExam.preparationPercent}%</strong>
+            </div>
+            <button className="panel-footer" onClick={onAddExam}>
+              <span>Ajouter un examen</span><IconArrow size={13} />
+            </button>
+          </>
+        ) : (
+          <div className="empty">
+            <p>Aucun examen enregistré.</p>
+            <button className="primary-button small" onClick={onAddExam}>
+              <IconAdd size={14} /> Ajouter
+            </button>
+          </div>
+        )}
+      </section>
+
+      <section className="panel tutor-panel-card">
+        <AITutorPanel />
+      </section>
+
+      <section className="panel agenda-panel">
+        <header className="panel-header">
+          <div>
+            <p className="eyebrow">Calendrier</p>
+            <h3>Échéances à venir</h3>
+          </div>
+        </header>
+        <div className="agenda-list">
+          {exams.slice(0, 3).map((exam) => {
+            const d = new Date(exam.examAt)
+            const days = daysUntil(exam.examAt)
+            return (
+              <div className="agenda-row" key={exam.id}>
+                <div className={`date-chip ${days <= 7 ? 'urgent' : ''}`}>
+                  <strong>{d.getDate()}</strong>
+                  <span>{d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase()}</span>
+                </div>
+                <div className="agenda-body">
+                  <strong>{exam.title}</strong>
+                  <small>{exam.subject} · {exam.preparationPercent}% prêt</small>
+                </div>
+                <span className={`agenda-tag ${days <= 7 ? 'urgent' : ''}`}>{days <= 1 ? 'Demain' : days === 0 ? 'Aujourd’hui' : `J−${days}`}</span>
+              </div>
+            )
+          })}
+          {exams.length === 0 && <p className="empty-line">Aucun examen planifié.</p>}
+        </div>
+      </section>
+    </div>
   )
 }
 
-function toneClass(priority: Task['priority']): string {
-  if (priority === 'low') return 'green'
-  if (priority === 'medium') return 'gold'
-  return ''
-}
-
-/* ---------- Tasks ---------- */
+/* ============================================================
+   TASKS view (full)
+   ============================================================ */
 interface TasksProps {
   tasks: Task[]
   onToggle: (id: string) => void
@@ -387,7 +577,10 @@ function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
   return (
     <>
       <div className="section-heading">
-        <div><p className="eyebrow">Espace de travail</p><h2>Tâches</h2></div>
+        <div>
+          <p className="eyebrow">Espace de travail</p>
+          <h2>Tâches</h2>
+        </div>
         <div className="segmented">
           {(['all', 'todo', 'done'] as const).map((k) => (
             <button key={k} className={filter === k ? 'is-active' : ''} onClick={() => setFilter(k)}>
@@ -396,30 +589,45 @@ function TasksView({ tasks, onToggle, onDelete, onAdd }: TasksProps) {
           ))}
         </div>
       </div>
-      <section className="panel tasks-panel">
-        <div className="panel-header"><div><h3>{filtered.length} tâche{filtered.length > 1 ? 's' : ''}</h3><span>Clique pour terminer, double-clique pour supprimer</span></div><button className="round-add" onClick={onAdd} aria-label="Ajouter"><Plus size={17} /></button></div>
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <h3>{filtered.length} tâche{filtered.length > 1 ? 's' : ''}</h3>
+            <span>Clique pour terminer · utilise la croix pour supprimer</span>
+          </div>
+          <button className="round-add" onClick={onAdd} aria-label="Ajouter"><IconAdd size={16} /></button>
+        </div>
         <div className="task-list">
           {filtered.map((task) => {
             const due = formatDue(task.dueAt)
             return (
-              <div className={`task-row ${task.status === 'done' ? 'done' : ''}`} key={task.id}>
+              <div className={`task-row ${task.status === 'done' ? 'is-done' : ''}`} key={task.id}>
                 <button className="check-btn" onClick={() => onToggle(task.id)} aria-label="Basculer">
-                  <span className={`check-circle ${task.status === 'done' ? 'checked' : ''}`}>{task.status === 'done' && <Check size={12} />}</span>
+                  <span className={`check-circle ${task.status === 'done' ? 'is-checked' : ''}`}>
+                    {task.status === 'done' && <IconCheck size={10} />}
+                  </span>
                 </button>
-                <div className="task-details"><strong>{task.title}</strong><small><i className={toneClass(task.priority)} />{task.subject} · {task.estimatedMinutes} min</small></div>
-                <span className={`task-time ${due.urgent ? 'urgent' : ''}`}>{due.label}</span>
-                <button className="ghost-button small" onClick={() => onDelete(task.id)} aria-label="Supprimer"><X size={14} /></button>
+                <div className="task-body">
+                  <strong>{task.title}</strong>
+                  <small><span className={`pill ${accentClass(task.priority)}`}>{task.subject}</span> · {task.estimatedMinutes} min</small>
+                </div>
+                <span className="task-due" style={{ color: due.color }}>{due.label}</span>
+                <button className="ghost-button small" onClick={() => onDelete(task.id)} aria-label="Supprimer">
+                  <IconClose size={12} />
+                </button>
               </div>
             )
           })}
-          {filtered.length === 0 && <p className="empty">Rien à afficher ici.</p>}
+          {filtered.length === 0 && <p className="empty-line">Rien à afficher ici.</p>}
         </div>
       </section>
     </>
   )
 }
 
-/* ---------- Exams ---------- */
+/* ============================================================
+   EXAMS view
+   ============================================================ */
 interface ExamsProps {
   exams: Exam[]
   onProgress: (id: string, percent: number) => void
@@ -429,9 +637,17 @@ interface ExamsProps {
 function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
   return (
     <>
-      <div className="section-heading"><div><p className="eyebrow">Préparation</p><h2>Examens</h2></div></div>
+      <div className="section-heading">
+        <div><p className="eyebrow">Préparation</p><h2>Examens</h2></div>
+      </div>
       <section className="panel">
-        <div className="panel-header"><div><h3>Tes examens à venir</h3><span>Ajuste ta progression au fil de tes révisions</span></div><button className="round-add" onClick={onAdd} aria-label="Ajouter"><Plus size={17} /></button></div>
+        <div className="panel-header">
+          <div>
+            <h3>Tes examens à venir</h3>
+            <span>Ajuste ta progression au fil de tes révisions</span>
+          </div>
+          <button className="round-add" onClick={onAdd} aria-label="Ajouter"><IconAdd size={16} /></button>
+        </div>
         <div className="exams-list">
           {exams.map((exam) => {
             const days = daysUntil(exam.examAt)
@@ -447,9 +663,7 @@ function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
                 <div className="progress-row">
                   <input
                     type="range"
-                    min={0}
-                    max={100}
-                    step={5}
+                    min={0} max={100} step={5}
                     value={exam.preparationPercent}
                     onChange={(e) => onProgress(exam.id, Number(e.target.value))}
                     aria-label="Progression"
@@ -457,19 +671,18 @@ function ExamsView({ exams, onProgress, onDelete, onAdd }: ExamsProps) {
                   <strong>{exam.preparationPercent}%</strong>
                 </div>
                 <button className="ghost-button small" onClick={() => onDelete(exam.id)}>
-                  <X size={14} /> Retirer
+                  <IconClose size={12} /> Retirer
                 </button>
               </div>
             )
           })}
-          {exams.length === 0 && <p className="empty">Aucun examen. Clique sur <strong>+</strong> pour en ajouter un.</p>}
+          {exams.length === 0 && <p className="empty-line">Aucun examen. Clique sur + pour en ajouter un.</p>}
         </div>
       </section>
     </>
   )
 }
 
-/* ---------- Planning ---------- */
 function PlanningView({ exams, tasks }: { exams: Exam[]; tasks: Task[] }) {
   const items = [
     ...exams.map((e) => ({ kind: 'exam' as const, at: e.examAt, title: e.title, sub: e.subject })),
@@ -488,7 +701,7 @@ function PlanningView({ exams, tasks }: { exams: Exam[]; tasks: Task[] }) {
               <div className="timeline-row" key={`${item.kind}-${i}`}>
                 <div className="timeline-date">
                   <strong>{d.getDate()}</strong>
-                  <span>{d.toLocaleDateString('fr-FR', { month: 'short' })}</span>
+                  <span>{d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '').toUpperCase()}</span>
                 </div>
                 <div className="timeline-body">
                   <strong>{item.title}</strong>
@@ -498,27 +711,36 @@ function PlanningView({ exams, tasks }: { exams: Exam[]; tasks: Task[] }) {
               </div>
             )
           })}
-          {items.length === 0 && <p className="empty">Pas d’échéance programmée. Ajoute une tâche ou un examen pour remplir ton planning.</p>}
+          {items.length === 0 && <p className="empty-line">Pas d’échéance programmée. Ajoute une tâche ou un examen.</p>}
         </div>
       </section>
     </>
   )
 }
 
-/* ---------- Focus ---------- */
 function FocusView({ thisWeek }: { thisWeek: number }) {
   return (
     <>
       <div className="section-heading"><div><p className="eyebrow">Sessions</p><h2>Focus</h2></div></div>
       <div className="dashboard-grid two">
-        <section className="panel"><div className="panel-header"><div><h3>Pomodoro</h3><span>25 minutes, sans interruption</span></div></div><Pomodoro defaultMinutes={25} /></section>
-        <section className="panel"><div className="panel-header"><div><h3>Cette semaine</h3><span>Ton rythme</span></div></div><div className="streak"><strong>{thisWeek}</strong><span>sessions<br />terminées</span><Flame size={28} /></div><p className="empty">Continue à ce rythme pour garder ta série.</p></section>
+        <section className="panel">
+          <div className="panel-header"><div><h3>Pomodoro</h3><span>25 minutes, sans interruption</span></div></div>
+          <Pomodoro defaultMinutes={25} />
+        </section>
+        <section className="panel">
+          <div className="panel-header"><div><h3>Cette semaine</h3><span>Ton rythme</span></div></div>
+          <div className="streak">
+            <strong>{thisWeek}</strong>
+            <span>sessions<br />terminées</span>
+            <div className="streak-flame"><IconFlame size={28} /></div>
+          </div>
+          <p className="empty-line">Continue à ce rythme pour garder ta série.</p>
+        </section>
       </div>
     </>
   )
 }
 
-/* ---------- Learn ---------- */
 function LearnView() {
   return (
     <>
@@ -528,13 +750,12 @@ function LearnView() {
           <h3>4 pistes interactives</h3>
           <p>Code, Python, Physique, Maths : leçons courtes, simulations vivantes, quiz.</p>
         </div>
-        <Link href="/learn" className="primary-button">Ouvrir l’académie <ArrowUpRight size={16} /></Link>
+        <Link href="/learn" className="primary-button">Ouvrir l’académie <IconArrow size={14} /></Link>
       </section>
     </>
   )
 }
 
-/* ---------- Documents ---------- */
 function DocumentsView() {
   return (
     <>
@@ -580,7 +801,7 @@ function DocumentUpload() {
       </label>
       <button type="submit" className="primary-button" disabled={pending}>{pending ? 'Envoi…' : 'Téléverser'}</button>
       {error && <p className="auth-error" role="alert">{error}</p>}
-      {success && <p className="empty" role="status">{success}</p>}
+      {success && <p className="empty-line" role="status">{success}</p>}
     </form>
   )
 }
@@ -604,23 +825,22 @@ function DocumentList() {
 
   return (
     <div className="task-list">
-      {docs === null && <p className="empty">Chargement…</p>}
-      {docs?.length === 0 && <p className="empty">Aucun document pour le moment.</p>}
+      {docs === null && <p className="empty-line">Chargement…</p>}
+      {docs?.length === 0 && <p className="empty-line">Aucun document pour le moment.</p>}
       {docs?.map((doc) => (
         <div className="task-row" key={doc.id}>
-          <div className="task-details">
+          <div className="task-body">
             <strong>{doc.filename}</strong>
-            <small>{doc.subject ?? 'Sans matière'} · {new Date(doc.createdAt).toLocaleDateString('fr-FR')}</small>
+            <small><span className="pill pill-amber">{doc.subject ?? 'Sans matière'}</span></small>
           </div>
           <a href={`/api/documents/file?id=${doc.id}`} target="_blank" rel="noopener noreferrer" className="ghost-button small">Ouvrir</a>
-          <button className="ghost-button small" onClick={() => remove(doc.id)} aria-label="Supprimer"><X size={14} /></button>
+          <button className="ghost-button small" onClick={() => remove(doc.id)} aria-label="Supprimer"><IconClose size={12} /></button>
         </div>
       ))}
     </div>
   )
 }
 
-/* ---------- Goals / Habits / Finance (lightweight) ---------- */
 function GoalsView() {
   const [items, setItems] = useState<Array<{ id: string; title: string; target: string; done: boolean }>>(() => readLocal('ontrack.goals', []))
   const [title, setTitle] = useState('')
@@ -642,22 +862,22 @@ function GoalsView() {
         >
           <label className="auth-field"><span>Intitulé</span><input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="Ex. Avoir 14 de moyenne en maths" /></label>
           <label className="auth-field"><span>Cible / date</span><input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="Ex. Fin mars" /></label>
-          <button className="primary-button" type="submit">Ajouter</button>
+          <button className="primary-button" type="submit"><IconAdd size={14} /> Ajouter</button>
         </form>
         <ul className="goal-list">
           {items.map((g) => (
             <li key={g.id}>
-              <button className={`check-circle ${g.done ? 'checked' : ''}`} onClick={() => {
+              <button className={`check-circle ${g.done ? 'is-checked' : ''}`} onClick={() => {
                 const next = items.map((x) => x.id === g.id ? { ...x, done: !x.done } : x)
                 setItems(next); writeLocal('ontrack.goals', next)
-              }}>{g.done && <Check size={12} />}</button>
+              }}>{g.done && <IconCheck size={10} />}</button>
               <div><strong style={{ textDecoration: g.done ? 'line-through' : 'none' }}>{g.title}</strong><small>{g.target}</small></div>
               <button className="ghost-button small" onClick={() => {
                 const next = items.filter((x) => x.id !== g.id); setItems(next); writeLocal('ontrack.goals', next)
-              }}><X size={14} /></button>
+              }}><IconClose size={12} /></button>
             </li>
           ))}
-          {items.length === 0 && <p className="empty">Aucun objectif pour l’instant.</p>}
+          {items.length === 0 && <p className="empty-line">Aucun objectif pour l’instant.</p>}
         </ul>
       </section>
     </>
@@ -680,9 +900,9 @@ function HabitsView({ thisWeek }: { thisWeek: number }) {
             const v = !!checks[k]
             return (
               <li key={h}>
-                <button className={`check-circle ${v ? 'checked' : ''}`} onClick={() => {
+                <button className={`check-circle ${v ? 'is-checked' : ''}`} onClick={() => {
                   const next = { ...checks, [k]: !v }; setChecks(next); writeLocal('ontrack.habits', next)
-                }}>{v && <Check size={12} />}</button>
+                }}>{v && <IconCheck size={10} />}</button>
                 <strong style={{ flex: 1, textDecoration: v ? 'line-through' : 'none' }}>{h}</strong>
               </li>
             )
@@ -699,7 +919,7 @@ function FinanceView() {
       <div className="section-heading"><div><p className="eyebrow">Boursier</p><h2>Finances</h2></div></div>
       <section className="panel">
         <div className="panel-header"><div><h3>Suivi des dépenses</h3><span>Bientôt disponible</span></div></div>
-        <p className="empty">OnTrack se concentre d’abord sur tes révisions. Le suivi financier arrive dans une prochaine mise à jour.</p>
+        <p className="empty-line">OnTrack se concentre d’abord sur tes révisions. Le suivi financier arrive dans une prochaine mise à jour.</p>
       </section>
     </>
   )
@@ -714,7 +934,6 @@ function writeLocal<T>(key: string, value: T) {
   try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* quota */ }
 }
 
-/* ---------- Modals ---------- */
 function TaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (input: { title: string; subject?: string; priority?: string; estimatedMinutes?: number; dueAt?: string }) => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -729,7 +948,7 @@ function TaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (inpu
           dueAt: String(fd.get('due') ?? '') || undefined,
         })
       }}>
-        <div className="modal-head"><div><p className="eyebrow">Nouvelle action</p><h3>Ajouter une tâche</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><X size={18} /></button></div>
+        <div className="modal-head"><div><p className="eyebrow">Nouvelle action</p><h3>Ajouter une tâche</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
         <label className="auth-field"><span>Titre</span><input name="title" autoFocus required placeholder="Ex. Revoir le chapitre 4" /></label>
         <label className="auth-field"><span>Matière</span><select name="subject" defaultValue="Mathématiques">{SUBJECTS.map((s) => <option key={s}>{s}</option>)}</select></label>
         <div className="modal-row">
@@ -737,7 +956,7 @@ function TaskModal({ onClose, onCreate }: { onClose: () => void; onCreate: (inpu
           <label className="auth-field"><span>Durée (min)</span><input name="minutes" type="number" min={5} max={240} defaultValue={25} /></label>
         </div>
         <label className="auth-field"><span>Échéance (optionnel)</span><input name="due" type="date" /></label>
-        <button className="primary-button modal-submit" type="submit"><Plus size={17} /> Ajouter</button>
+        <button className="primary-button modal-submit" type="submit"><IconAdd size={17} /> Ajouter</button>
       </form>
     </div>
   )
@@ -755,11 +974,11 @@ function ExamModal({ onClose, onCreate }: { onClose: () => void; onCreate: (inpu
           examAt: String(fd.get('examAt') ?? ''),
         })
       }}>
-        <div className="modal-head"><div><p className="eyebrow">Nouveau rendez-vous</p><h3>Ajouter un examen</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><X size={18} /></button></div>
+        <div className="modal-head"><div><p className="eyebrow">Nouveau rendez-vous</p><h3>Ajouter un examen</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
         <label className="auth-field"><span>Titre</span><input name="title" autoFocus required placeholder="Ex. Bac blanc de maths" /></label>
         <label className="auth-field"><span>Matière</span><select name="subject" defaultValue="Mathématiques">{SUBJECTS.map((s) => <option key={s}>{s}</option>)}</select></label>
         <label className="auth-field"><span>Date</span><input name="examAt" type="date" required /></label>
-        <button className="primary-button modal-submit" type="submit"><Plus size={17} /> Ajouter</button>
+        <button className="primary-button modal-submit" type="submit"><IconAdd size={17} /> Ajouter</button>
       </form>
     </div>
   )
@@ -767,7 +986,7 @@ function ExamModal({ onClose, onCreate }: { onClose: () => void; onCreate: (inpu
 
 function PushModal({ onClose }: { onClose: () => void }) {
   const [pending, startTransition] = useTransition()
-  const [status, setStatus] = useState<string>('')
+  const [status, setStatus] = useState('')
 
   async function enable() {
     if (!('Notification' in window)) { setStatus('Notifications non supportées sur ce navigateur.'); return }
@@ -793,10 +1012,10 @@ function PushModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="quick-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head"><div><p className="eyebrow">Notifications</p><h3>Activer les rappels</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><X size={18} /></button></div>
-        <p className="empty">OnTrack peut t’envoyer des notifications pour les fins de session de focus et les rappels d’examens. Aucune pub, jamais.</p>
+        <div className="modal-head"><div><p className="eyebrow">Notifications</p><h3>Activer les rappels</h3></div><button type="button" onClick={onClose} aria-label="Fermer"><IconClose size={18} /></button></div>
+        <p className="empty-line">OnTrack peut t’envoyer des notifications pour les fins de session de focus et les rappels d’examens. Aucune pub, jamais.</p>
         <button className="primary-button modal-submit" onClick={enable} disabled={pending}>{pending ? 'Activation…' : 'Activer les notifications'}</button>
-        {status && <p className="empty" role="status">{status}</p>}
+        {status && <p className="empty-line" role="status">{status}</p>}
       </div>
     </div>
   )

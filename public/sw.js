@@ -1,7 +1,7 @@
 // OnTrack service worker — minimal shell + offline fallback.
 // Cached pages: landing, sign-in, sign-up, legal, dashboard.
-// API calls bypass cache. Pyodide, fonts, images: stale-while-revalidate.
-const VERSION = 'ontrack-v1'
+// API calls bypass cache. Static assets: stale-while-revalidate.
+const VERSION = 'ontrack-v2'
 const CORE = [
   '/',
   '/sign-in',
@@ -10,8 +10,7 @@ const CORE = [
   '/dashboard',
   '/learn',
   '/manifest.webmanifest',
-  '/icon.svg',
-  '/icon-light-32x32.png',
+  '/logo.png',
 ]
 
 self.addEventListener('install', (event) => {
@@ -35,8 +34,6 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
-
-  // Never cache API, auth, push, learn-state POSTs, uploads.
   if (url.pathname.startsWith('/api/')) return
 
   if (req.mode === 'navigate') {
@@ -57,7 +54,6 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Stale-while-revalidate for static assets.
   event.respondWith((async () => {
     const cached = await caches.match(req)
     const network = fetch(req).then((res) => {
@@ -80,8 +76,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil((async () => {
     await self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/icon-light-32x32.png',
-      badge: '/icon-light-32x32.png',
+      icon: '/logo.png',
+      badge: '/logo.png',
       data: { url: payload.url },
     })
   })())

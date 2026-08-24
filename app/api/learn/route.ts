@@ -25,6 +25,8 @@ function readXpRow(row: unknown): number {
   return typeof xp === 'number' ? xp : 0
 }
 
+const PASS_THRESHOLD = 80
+
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
   return session?.user?.id ?? null
@@ -54,6 +56,7 @@ export async function GET() {
     badges: [...earnedBadges(completions.map((c) => ({ lessonId: c.lessonId, score: c.score })))],
     allLessons: ALL_LESSONS.length,
     badgeCatalog: BADGES,
+    passThreshold: PASS_THRESHOLD,
   })
 }
 
@@ -70,7 +73,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Leçon inconnue' }, { status: 400 })
   }
 
-  const earned = xpForLesson(score)
+  // 80% gate — student cannot move on without passing.
+  if (score < PASS_THRESHOLD) {
+    return NextResponse.json({
+      passed: false,
+      score,
+      threshold: PASS_THRESHOLD,
+      message: `Score ${score}% insuffisant. Il faut au moins ${PASS_THRESHOLD}% pour valider la leçon. Retente !`,
+    }, { status: 400 })
+  }
 
   const existing = await db
     .select({ id: lessonProgress.id, xpAwarded: lessonProgress.xpAwarded })
@@ -80,11 +91,14 @@ export async function POST(request: Request) {
 
   if (existing[0]) {
     return NextResponse.json({
+      passed: true,
       alreadyCompleted: true,
       xpAwarded: existing[0].xpAwarded,
       totalXp: await fetchXp(userId),
     })
   }
+
+  const earned = xpForLesson(score)
 
   await db.insert(lessonProgress).values({
     userId,
@@ -96,6 +110,7 @@ export async function POST(request: Request) {
   const total = await incrementXp(userId, earned)
 
   return NextResponse.json({
+    passed: true,
     alreadyCompleted: false,
     xpAwarded: earned,
     totalXp: total,

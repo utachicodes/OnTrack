@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Inter, Space_Mono, Instrument_Serif } from 'next/font/google'
+import { Plus_Jakarta_Sans, Space_Mono, Instrument_Serif } from 'next/font/google'
 import './globals.css'
 import { ThemeInit } from '@/components/theme-init'
 import { PWABootstrap } from '@/components/pwa-bootstrap'
@@ -9,19 +9,18 @@ import { db } from '@/lib/db'
 import { userPreferences } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
-const inter = Inter({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-sans',
+  weight: ['400', '500', '600', '700', '800'],
 })
-
 const spaceMono = Space_Mono({
   subsets: ['latin'],
   weight: ['400', '700'],
   display: 'swap',
   variable: '--font-mono',
 })
-
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
@@ -31,7 +30,7 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'OnTrack',
+  title: 'OnTrack · Utachi Industries',
   description:
     'Tâches, examens, sessions de focus et tuteur IA. Un espace privé pour préparer le BAC avec sérénité.',
   generator: 'next.js',
@@ -44,11 +43,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', sizes: 'any', type: 'image/png' },
       { url: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icon-dark-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
   },
 }
 
@@ -64,7 +62,7 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession()
-  let themePreference: 'light' | 'dark' | 'system' = 'system'
+  let themePreference: 'light' | 'dark' | 'system' = 'light'
   let accentColor: string = 'coral'
 
   if (session?.user?.id) {
@@ -79,19 +77,17 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     }
   }
 
-  const resolvedTheme = themePreference
-
   return (
     <html
       lang="fr"
-      data-theme={resolvedTheme}
+      data-theme={themePreference}
       data-accent={accentColor}
-      className={`${inter.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}
+      className={`${jakarta.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}
     >
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body className="antialiased">
         {children}

@@ -61,3 +61,47 @@ export const userXp = pgTable('user_xp', {
   xp: integer('xp').notNull().default(0),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
+
+export const flashcardDecks = pgTable('flashcard_decks', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull(),
+  trackId: text('track_id').notNull(),
+  chapterId: text('chapter_id'),
+  title: text('title').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const flashcards = pgTable('flashcards', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull(),
+  trackId: text('track_id').notNull(),
+  chapterId: text('chapter_id'),
+  front: text('front').notNull(),
+  back: text('back').notNull(),
+  ease: integer('ease').notNull().default(250),
+  intervalDays: integer('interval_days').notNull().default(0),
+  repetitions: integer('repetitions').notNull().default(0),
+  dueAt: timestamp('due_at', { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [uniqueIndex('flashcards_user_front_uq').on(t.userId, t.front)])
+
+export const mockExams = pgTable('mock_exams', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull(),
+  trackId: text('track_id').notNull(),
+  duration: integer('duration').notNull(),
+  totalQuestions: integer('total_questions').notNull(),
+  score: integer('score'),
+  status: text('status').notNull().default('in_progress'),
+  startedAt: timestamp('started_at', { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+})
+
+export const mockExamResponses = pgTable('mock_exam_responses', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  examId: uuid('exam_id').notNull().references(() => mockExams.id, { onDelete: 'cascade' }),
+  questionId: text('question_id').notNull(),
+  response: integer('response').notNull(),
+  correct: integer('correct').notNull(),
+  reviewed: integer('reviewed').notNull().default(0),
+}, (t) => [uniqueIndex('mock_exam_responses_uq').on(t.examId, t.questionId)])

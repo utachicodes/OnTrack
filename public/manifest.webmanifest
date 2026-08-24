@@ -1,20 +1,18 @@
 {
-  "name": "OnTrack — Prépare ton BAC avec sérénité",
+  "name": "OnTrack · Prépare ton BAC avec sérénité",
   "short_name": "OnTrack",
   "description": "Tâches, examens, sessions de focus et tuteur IA pour le BAC français.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f1115",
+  "background_color": "#fbfaf7",
   "theme_color": "#ee705f",
   "categories": ["education", "productivity"],
   "lang": "fr",
   "icons": [
-    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "/icon-light-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-dark-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/apple-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "180x180", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
     {
@@ -27,7 +25,7 @@
       "name": "Apprendre",
       "short_name": "Apprendre",
       "url": "/learn",
-      "description": "Ouvre l’académie interactive"
+      "description": "Ouvre l'académie interactive"
     }
   ]
 }
