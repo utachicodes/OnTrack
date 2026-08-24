@@ -113,11 +113,15 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
   const firstName = userName.trim().split(/\s+/)[0] || 'toi'
   const initials = userName.trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase()
 
+  const [tasks, setTasks] = useState<Task[]>(initialTasks)
+  const [exams, setExams] = useState<Exam[]>(initialExams)
+  const [modal, setModal] = useState<TaskKind | null>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [showPush, setShowPush] = useState(false)
   const [nav, setNav] = useState<NavKey>('overview')
   const [collapsed, setCollapsed] = useState(false)
   const [showInstallPill, setShowInstallPill] = useState(false)
   const [activeBadge, setActiveBadge] = useState<NavKey | null>(null)
-
   useEffect(() => {
     if (typeof window === 'undefined') return
     setCollapsed(localStorage.getItem('ontrack.sidebar.collapsed') !== 'false')
