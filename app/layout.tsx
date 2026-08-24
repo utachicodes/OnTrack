@@ -2,7 +2,6 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Mono, Instrument_Serif } from 'next/font/google'
 import './globals.css'
-import { GridToggle } from '@/components/landing/grid-toggle'
 import { ThemeInit } from '@/components/theme-init'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -31,17 +30,16 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'orbite — Ton espace pour avancer',
-  description:
-    'Tâches, examens, sessions de focus et tuteur IA — tout ce qu’il te faut pour préparer le BAC avec sérénité.',
+  title: 'Aurevon',
+  description: 'A carefully curated collection beyond compare.',
   generator: 'next.js',
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light dark',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#111315' },
+    { media: '(prefers-color-scheme: light)', color: '#000000' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -66,11 +64,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   // Resolve 'system' to the user's OS preference at SSR time so the first
   // paint already matches what ThemeInit will compute client-side.
-  const resolvedTheme = themePreference // ThemeInit refines for system later
+  const resolvedTheme = themePreference
 
   return (
     <html
-      lang="fr"
+      lang="en"
       data-theme={resolvedTheme}
       data-accent={accentColor}
       className={`${inter.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}
@@ -78,7 +76,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className="antialiased">
         {children}
         <ThemeInit preference={themePreference} />
-        <GridToggle />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

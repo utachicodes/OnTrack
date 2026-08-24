@@ -1,109 +1,62 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export function Hero() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setMounted(true), 300)
+    return () => window.clearTimeout(t)
+  }, [])
+
   return (
-    <section className="spread">
-      <div className="wrap">
-        <div className="grid">
-          {/* Top band — kicker + folio */}
-          <div className="band" style={{ paddingTop: 'calc(var(--lh) * 4)' }}>
-            <div style={{ gridColumn: '1 / 7' }} className="kicker">
-              <span className="accent">●</span> Édition · Terminale · BAC 2026
-            </div>
-            <div style={{ gridColumn: '12 / 13' }} className="kicker" aria-hidden="true">
-              01 / 01
-            </div>
-          </div>
+    <section className="relative w-full h-screen overflow-hidden flex items-end justify-center">
+      <div
+        className={`absolute inset-0 transition-[transform,opacity] duration-[1400ms] ease-entrance ${
+          mounted ? 'scale-100 opacity-100' : 'scale-105 opacity-0'
+        }`}
+      >
+        <video
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260819_212700_3bb9329b-5c50-4257-a09b-ca85cf3654a3.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
+      </div>
 
-          {/* Headline band — masthead + big numeral */}
-          <div className="band" style={{ paddingTop: 'calc(var(--lh) * 2)' }}>
-            <h1
-              className="masthead"
-              style={{ gridColumn: '1 / 11' }}
-              aria-label="Ton espace pour avancer"
-            >
-              Ton espace
-              <br />
-              pour <em>avancer.</em>
-            </h1>
-            <div style={{ gridColumn: '11 / 13', alignSelf: 'end' }}>
-              <div className="numeral">
-                BAC<span className="unit">26</span>
-              </div>
-              <div className="cap" style={{ marginTop: '8px' }}>
-                Compte à rebours
-              </div>
-            </div>
-          </div>
+      <div className="relative z-10 text-center px-6 pb-16 md:pb-24 max-w-4xl mx-auto">
+        <h1
+          className={`font-instrument text-white text-[2.5rem] leading-[0.95] sm:text-5xl md:text-6xl lg:text-7xl mb-5 md:mb-6 transition-[transform,opacity] duration-900 ease-entrance ${
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: mounted ? '400ms' : '0ms' }}
+        >
+          A carefully curated
+          <br className="hidden sm:block" /> collection beyond compare
+        </h1>
 
-          {/* Lede band — subcopy + CTAs */}
-          <div className="band" style={{ paddingTop: 'calc(var(--lh) * 2)' }}>
-            <p className="lede" style={{ gridColumn: '1 / 8' }}>
-              Tâches, examens, sessions de focus et tuteur IA. Un espace calme et précis pour préparer le
-              BAC avec méthode — pas avec anxiété.
-            </p>
-            <div
-              style={{ gridColumn: '9 / 13', display: 'flex', flexDirection: 'column', gap: 'var(--lh)' }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--bl)' }}>
-                <Link href="/sign-up" className="cta">
-                  Créer mon espace <span className="arr">→</span>
-                </Link>
-                <Link href="/sign-in" className="cta-ghost">
-                  J’ai déjà un compte
-                </Link>
-              </div>
-              <div className="cap">Gratuit · Sans carte bancaire</div>
-            </div>
-          </div>
+        <p
+          className={`text-white/70 text-base md:text-lg mb-8 md:mb-10 max-w-md mx-auto transition-[transform,opacity] duration-900 ease-entrance ${
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: mounted ? '600ms' : '0ms' }}
+        >
+          Reserve your place in our private gallery.
+        </p>
 
-          {/* Feature row — three columns of editorial entries */}
-          <div className="band" style={{ paddingTop: 'calc(var(--lh) * 3)' }}>
-            <article style={{ gridColumn: '1 / 5' }}>
-              <hr className="hairline" />
-              <div className="kicker" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>01 — Tâches</div>
-              <p className="body" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>
-                Liste claire par matière, par jour, par priorité. Coche, avance, recommence.
-              </p>
-            </article>
-            <article style={{ gridColumn: '5 / 9' }}>
-              <hr className="hairline" />
-              <div className="kicker" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>02 — Focus</div>
-              <p className="body" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>
-                Sessions de 25 minutes, interruptions comptées, progression visible.
-              </p>
-            </article>
-            <article style={{ gridColumn: '9 / 13' }}>
-              <hr className="hairline" />
-              <div className="kicker" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>
-                03 — Tuteur <span className="accent">IA</span>
-              </div>
-              <p className="body" style={{ paddingTop: 'calc(var(--lh) / 2)' }}>
-                Explique, ne fait pas à ta place. Sur maths, philo, histoire, SVT, français.
-              </p>
-            </article>
-          </div>
-
-          {/* Bottom meta — long rule + folio */}
-          <div className="band" style={{ paddingTop: 'calc(var(--lh) * 4)', paddingBottom: 'calc(var(--lh) * 2)' }}>
-            <div style={{ gridColumn: '1 / 6' }} className="cap">
-              Orbite · Lyon · 2024—2026
-            </div>
-            <div style={{ gridColumn: '7 / 13' }} className="cap">
-              Prépare ton BAC, pas la panique.
-            </div>
-          </div>
-        </div>
-
-        {/* Per-spread grid overlay (same .wrap box → columns match content exactly) */}
-        <div className="guides" aria-hidden="true">
-          <div className="cols" />
-          <div className="rows" />
-          <div className="mline l" />
-          <div className="mline r" />
-        </div>
+        <Link
+          href="/sign-up"
+          className={`inline-block px-8 py-3.5 bg-white text-black text-sm md:text-base font-medium rounded-full hover:bg-white/90 transition-[transform,opacity] duration-900 ease-entrance ${
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: mounted ? '800ms' : '0ms' }}
+        >
+          Join the waitlist
+        </Link>
       </div>
     </section>
   )

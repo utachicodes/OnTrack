@@ -26,8 +26,11 @@ export function Landing() {
   }, [overlayOpen])
 
   return (
-    <div className="bg-white text-[var(--ink)]">
-      <Navbar overlayOpen={overlayOpen} onToggleOverlay={() => setOverlayOpen((v) => !v)} />
+    <div className="min-h-screen bg-black">
+      <Navbar
+        overlayOpen={overlayOpen}
+        onToggleOverlay={() => setOverlayOpen((v) => !v)}
+      />
       <OverlayMenu open={overlayOpen} onClose={() => setOverlayOpen(false)} />
       <Hero />
     </div>
