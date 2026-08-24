@@ -51,7 +51,7 @@ export function Navbar({
           }`}
           style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
         >
-          {overlayOpen ? 'Close' : 'Navigate'}
+          {overlayOpen ? 'Fermer' : 'Menu'}
         </button>
 
         <div

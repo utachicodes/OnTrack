@@ -27,8 +27,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     if (result.error) {
       setError(
         isSignUp
-          ? "We couldn't create your account. Please check your details and try again."
-          : "We couldn't sign you in with those details. Please try again.",
+          ? "Impossible de créer votre compte. Vérifiez vos informations et réessayez."
+          : "Connexion impossible avec ces identifiants. Réessayez.",
       )
       return
     }
@@ -40,13 +40,13 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     <form className="lux-auth-form" onSubmit={submit} noValidate={false}>
       {isSignUp && (
         <label className="lux-auth-field">
-          Full name
+          Nom complet
           <input
             className="lux-auth-input"
             name="name"
             required
             autoComplete="name"
-            placeholder="Your name"
+            placeholder="Votre nom"
           />
         </label>
       )}
@@ -58,11 +58,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           type="email"
           required
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder="vous@exemple.com"
         />
       </label>
       <label className="lux-auth-field">
-        Password
+        Mot de passe
         <input
           className="lux-auth-input"
           name="password"
@@ -70,7 +70,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           required
           minLength={8}
           autoComplete={isSignUp ? 'new-password' : 'current-password'}
-          placeholder={isSignUp ? 'At least 8 characters' : 'Your password'}
+          placeholder={isSignUp ? 'Au moins 8 caractères' : 'Votre mot de passe'}
         />
       </label>
       {error && (
@@ -81,11 +81,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       <button className="lux-auth-submit" type="submit" disabled={pending}>
         {pending
           ? isSignUp
-            ? 'Creating account…'
-            : 'Signing in…'
+            ? 'Création du compte…'
+            : 'Connexion…'
           : isSignUp
-            ? 'Create account'
-            : 'Sign in'}
+            ? 'Créer mon compte'
+            : 'Se connecter'}
       </button>
     </form>
   )

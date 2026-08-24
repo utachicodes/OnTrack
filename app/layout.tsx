@@ -31,7 +31,8 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   title: 'Aurevon',
-  description: 'A carefully curated collection beyond compare.',
+  description:
+    'Tâches, examens, sessions de focus et tuteur IA — un espace privé pour préparer le BAC avec sérénité.',
   generator: 'next.js',
 }
 
@@ -68,7 +69,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html
-      lang="en"
+      lang="fr"
       data-theme={resolvedTheme}
       data-accent={accentColor}
       className={`${inter.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}

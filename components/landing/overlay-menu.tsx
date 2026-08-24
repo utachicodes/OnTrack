@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react'
 
 const links = [
-  { label: 'Home', href: '/' },
-  { label: 'Story', href: '/sign-in' },
-  { label: 'Collection', href: '/dashboard' },
-  { label: 'Inquire', href: '/sign-up' },
+  { label: 'Accueil', href: '/' },
+  { label: 'Espace', href: '/dashboard' },
+  { label: 'Connexion', href: '/sign-in' },
+  { label: 'Rejoindre', href: '/sign-up' },
 ]
 
 export function OverlayMenu({ open, onClose }: { open: boolean; onClose: () => void }) {

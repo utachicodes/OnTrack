@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import { AuthForm } from '@/components/auth-form'
 
 export const metadata = {
-  title: 'Create account — Aurevon',
+  title: 'Créer un compte — Aurevon',
 }
 
 export default function SignUpPage() {
@@ -14,22 +14,22 @@ export default function SignUpPage() {
           <span className="lux-auth-eyebrow">Aurevon — Invitation</span>
           <Link href="/" className="lux-auth-back">
             <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
-            Back
+            Retour
           </Link>
         </div>
 
         <header>
-          <h1 className="lux-auth-title">Join the list.</h1>
+          <h1 className="lux-auth-title">Créez votre espace.</h1>
           <p className="lux-auth-intro" style={{ marginTop: 14 }}>
-            Create your account to reserve a place in our private gallery and unlock the full collection.
+            Un espace privé pour préparer le BAC avec méthode : tâches, examens, sessions de focus et tuteur IA.
           </p>
         </header>
 
         <AuthForm mode="sign-up" />
 
         <p className="lux-auth-switch">
-          Already have an account?{' '}
-          <Link href="/sign-in">Sign in</Link>
+          Déjà membre ?{' '}
+          <Link href="/sign-in">Se connecter</Link>
         </p>
       </div>
     </main>

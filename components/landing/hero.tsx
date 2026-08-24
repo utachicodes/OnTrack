@@ -35,8 +35,8 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '400ms' : '0ms' }}
         >
-          A carefully curated
-          <br className="hidden sm:block" /> collection beyond compare
+          Réviser avec méthode,
+          <br className="hidden sm:block" /> réussir avec sérénité
         </h1>
 
         <p
@@ -45,7 +45,7 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '600ms' : '0ms' }}
         >
-          Reserve your place in our private gallery.
+          Tâches, examens, sessions de focus et tuteur IA — réunis dans un espace privé pensé pour le BAC.
         </p>
 
         <Link
@@ -55,7 +55,7 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '800ms' : '0ms' }}
         >
-          Join the waitlist
+          Créer mon espace
         </Link>
       </div>
     </section>
