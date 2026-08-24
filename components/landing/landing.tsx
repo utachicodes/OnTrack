@@ -16,12 +16,18 @@ export function Landing() {
     }
   }, [overlayOpen])
 
+  useEffect(() => {
+    if (!overlayOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOverlayOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [overlayOpen])
+
   return (
-    <div className="bg-black">
-      <Navbar
-        overlayOpen={overlayOpen}
-        onToggleOverlay={() => setOverlayOpen((v) => !v)}
-      />
+    <div className="bg-white text-[var(--ink)]">
+      <Navbar overlayOpen={overlayOpen} onToggleOverlay={() => setOverlayOpen((v) => !v)} />
       <OverlayMenu open={overlayOpen} onClose={() => setOverlayOpen(false)} />
       <Hero />
     </div>

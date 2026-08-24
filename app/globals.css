@@ -218,6 +218,187 @@ button { cursor: pointer; }
 }
 .lux-auth-switch a:hover { border-color: #fff; }
 
+/* ============================================================
+   MÜLLER-BROCKMANN EDITORIAL GRID
+   One source of truth (:root vars). Content + overlay share
+   the same .wrap box so the columns truly match at every width.
+   Bands re-expose the grid via subgrid; every element snaps to a
+   column line. Toggleable .guides overlay (button or 'G').
+   ============================================================ */
+:root {
+  --cols: 12;
+  --bl: 8px;                /* baseline unit */
+  --lh: 24px;               /* leading = 3 x baseline */
+  --gutter: 24px;
+  --margin: 56px;
+  --pad: 56px;              /* spread top/bottom pad */
+  --maxw: 1296px;
+
+  --paper: #ffffff;
+  --ink: #111315;
+  --ink-soft: #5b6066;
+  --rule: #d8dadd;
+  --accent: #e4002b;        /* Swiss red — canonical accent */
+
+  --g-col: rgba(228, 0, 43, 0.06);
+  --g-edge: rgba(228, 0, 43, 0.35);
+  --g-base: rgba(0, 130, 120, 0.30);
+  --g-base-min: rgba(0, 130, 120, 0.10);
+}
+
+/* --- spread + grid scaffold --- */
+.spread { position: relative; width: 100%; }
+.wrap {
+  position: relative;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--pad) var(--margin);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  column-gap: var(--gutter);
+  row-gap: var(--lh);
+}
+.band {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  column-gap: var(--gutter);
+  row-gap: var(--lh);
+  align-items: start;
+}
+@supports not (grid-template-columns: subgrid) {
+  .band { grid-template-columns: repeat(var(--cols), 1fr); }
+}
+
+/* --- grid overlay (same content box -> columns match exactly) --- */
+.guides {
+  position: absolute; inset: 0; pointer-events: none; z-index: 60;
+  opacity: 0; transition: opacity 260ms ease;
+}
+body.grid-on .guides { opacity: 1; }
+.guides .cols {
+  position: absolute; top: 0; bottom: 0;
+  left: var(--margin); right: var(--margin);
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  column-gap: var(--gutter);
+}
+.guides .col {
+  background: var(--g-col);
+  box-shadow: inset 1px 0 0 var(--g-edge), inset -1px 0 0 var(--g-edge);
+  position: relative;
+}
+.guides .col span {
+  position: absolute; top: 32px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px; line-height: 1;
+  color: var(--accent);
+}
+.guides .rows {
+  position: absolute;
+  left: var(--margin); right: var(--margin);
+  top: var(--pad); bottom: 0;
+  background-image:
+    repeating-linear-gradient(to bottom, var(--g-base) 0 1px, transparent 1px var(--lh)),
+    repeating-linear-gradient(to bottom, var(--g-base-min) 0 1px, transparent 1px var(--bl));
+}
+.guides .mline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--g-edge); }
+.guides .mline.l { left: var(--margin); }
+.guides .mline.r { right: var(--margin); }
+
+/* --- grid toggle button --- */
+.grid-toggle {
+  position: fixed; top: 18px; right: 18px; z-index: 200;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--ink); color: #fff; border: none; cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 10px 14px;
+}
+.grid-toggle .dot { width: 9px; height: 9px; border-radius: 50%; background: #555; }
+body.grid-on .grid-toggle { background: var(--accent); }
+body.grid-on .grid-toggle .dot { background: #fff; }
+
+/* --- editorial typography --- */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink);
+}
+.kicker .accent { color: var(--accent); }
+.masthead {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-size: clamp(40px, 8vw, 120px);
+  line-height: 88px; /* px multiple of --bl */
+  margin: 0;
+}
+.masthead em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+}
+.lede {
+  font-size: 18px; line-height: var(--lh);
+  color: var(--ink);
+  max-width: 56ch;
+}
+.body {
+  font-size: 15px; line-height: var(--lh);
+  color: var(--ink-soft);
+}
+.cap {
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.hairline {
+  height: 1px; background: var(--ink);
+  border: 0;
+}
+.numeral {
+  font-family: var(--font-sans);
+  font-size: clamp(72px, 14vw, 200px);
+  line-height: 168px; /* 21 x 8 */
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+}
+.numeral .unit {
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+  font-weight: 400; color: var(--accent);
+  vertical-align: super;
+  margin-left: 8px;
+}
+.cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--ink); color: var(--paper);
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 14px;
+  padding: 16px 24px;
+  border: 0; cursor: pointer;
+  transition: background 160ms ease;
+}
+.cta:hover { background: var(--accent); }
+.cta .arr { font-family: var(--font-mono); font-size: 14px; }
+.cta-ghost {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent; color: var(--ink);
+  border: 1px solid var(--ink);
+  font-family: var(--font-sans); font-weight: 600;
+  font-size: 14px;
+  padding: 16px 24px;
+  transition: background 160ms ease, color 160ms ease;
+  cursor: pointer;
+}
+.cta-ghost:hover { background: var(--ink); color: var(--paper); }
+
 /* ===========================
    Orbite dashboard (legacy)
    =========================== */

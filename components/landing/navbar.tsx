@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Flower2 } from 'lucide-react'
 
 export function Navbar({
   overlayOpen,
@@ -10,84 +9,101 @@ export function Navbar({
   overlayOpen: boolean
   onToggleOverlay: () => void
 }) {
-  const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const mountTimer = window.setTimeout(() => setMounted(true), 100)
     const onScroll = () => setScrolled(window.scrollY > 40)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => {
-      window.clearTimeout(mountTimer)
-      window.removeEventListener('scroll', onScroll)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-500 ${
-        scrolled ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'
+      className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
+        scrolled ? 'bg-white/85 backdrop-blur-md border-b border-[var(--rule)]' : 'bg-transparent'
       }`}
     >
-      <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
-        {/* Left — logo */}
+      <div
+        className="grid mx-auto"
+        style={{
+          maxWidth: 'var(--maxw)',
+          padding: 'calc(var(--lh) * 0.75) var(--margin)',
+          alignItems: 'center',
+        }}
+      >
         <a
           href="/"
           aria-label="orbite — accueil"
-          className={`text-white text-xl md:text-2xl font-semibold tracking-tight z-50 transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '0ms' : '0ms' }}
+          className="kicker"
+          style={{ gridColumn: '1 / 3', color: 'var(--ink)' }}
         >
-          orbite
+          <span className="accent">●</span> orbite
         </a>
 
-        {/* Center — desktop pill */}
-        <button
-          type="button"
-          onClick={onToggleOverlay}
-          aria-expanded={overlayOpen}
-          aria-controls="landing-overlay"
-          className={`hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/90 text-sm hover:bg-white/10 transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
-        >
-          {overlayOpen ? 'Fermer' : 'Menu'}
-        </button>
-
-        {/* Right — desktop icon */}
+        {/* desktop section list */}
         <div
-          className={`hidden md:flex transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '400ms' : '0ms' }}
+          className="hidden md:flex"
+          style={{ gridColumn: '5 / 11', justifyContent: 'center', gap: '32px' }}
         >
-          <Flower2 className="w-7 h-7 text-white/90" aria-hidden="true" />
+          <a href="#methode" className="kicker" style={{ color: 'var(--ink-soft)' }}>
+            Méthode
+          </a>
+          <a href="#tuteur" className="kicker" style={{ color: 'var(--ink-soft)' }}>
+            Tuteur IA
+          </a>
+          <a href="/dashboard" className="kicker" style={{ color: 'var(--ink-soft)' }}>
+            Tableau de bord
+          </a>
         </div>
 
-        {/* Right — mobile hamburger */}
+        {/* desktop sign-in */}
+        <a
+          href="/sign-in"
+          className="hidden md:inline-flex cta"
+          style={{ gridColumn: '12 / 13', justifySelf: 'end', padding: '10px 16px', fontSize: '12px' }}
+        >
+          Se connecter <span className="arr">→</span>
+        </a>
+
+        {/* mobile hamburger */}
         <button
           type="button"
           onClick={onToggleOverlay}
           aria-label="Ouvrir le menu"
           aria-expanded={overlayOpen}
           aria-controls="landing-overlay"
-          className={`md:hidden flex flex-col items-center justify-center gap-1.5 w-8 h-8 transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
+          className="md:hidden"
+          style={{
+            gridColumn: '11 / 13',
+            justifySelf: 'end',
+            background: 'transparent',
+            border: 0,
+            padding: '4px 8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '5px',
+          }}
         >
           <span
-            className={`block w-6 h-[2px] bg-white transition-transform duration-500 ease-overlay ${
-              overlayOpen ? 'translate-y-[4px] rotate-45' : ''
-            }`}
+            style={{
+              display: 'block',
+              width: '24px',
+              height: '2px',
+              background: 'var(--ink)',
+              transition: 'transform 320ms cubic-bezier(0.76,0,0.24,1)',
+              transform: overlayOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+            }}
           />
           <span
-            className={`block w-6 h-[2px] bg-white transition-transform duration-500 ease-overlay ${
-              overlayOpen ? '-translate-y-[4px] -rotate-45' : ''
-            }`}
+            style={{
+              display: 'block',
+              width: '24px',
+              height: '2px',
+              background: 'var(--ink)',
+              transition: 'transform 320ms cubic-bezier(0.76,0,0.24,1)',
+              transform: overlayOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+            }}
           />
         </button>
       </div>

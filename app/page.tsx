@@ -3,7 +3,7 @@ import { getSession } from '@/lib/auth'
 import { Landing } from '@/components/landing/landing'
 
 export const metadata = {
-  title: 'Aurevon',
+  title: 'orbite — Ton espace pour avancer',
 }
 
 export default async function Page() {
