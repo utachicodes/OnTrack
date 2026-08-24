@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 export function Hero() {
   const [mounted, setMounted] = useState(false)
@@ -36,8 +37,8 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '400ms' : '0ms' }}
         >
-          A carefully curated
-          <br className="hidden sm:block" /> collection beyond compare
+          Ton espace
+          <br className="hidden sm:block" /> pour avancer
         </h1>
 
         <p
@@ -46,18 +47,28 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '600ms' : '0ms' }}
         >
-          Reserve your place in our private gallery.
+          Tâches, examens, sessions de focus et tuteur IA — tout ce qu’il te faut pour préparer le BAC avec sérénité.
         </p>
 
-        <a
-          href="#"
-          className={`inline-block px-8 py-3.5 bg-white text-black text-sm md:text-base font-medium rounded-full hover:bg-white/90 transition-[transform,opacity] duration-900 ease-entrance ${
+        <div
+          className={`flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 transition-[transform,opacity] duration-900 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ transitionDelay: mounted ? '800ms' : '0ms' }}
         >
-          Join the waitlist
-        </a>
+          <Link
+            href="/sign-up"
+            className="inline-block px-8 py-3.5 bg-white text-black text-sm md:text-base font-medium rounded-full hover:bg-white/90 transition-colors"
+          >
+            Créer mon espace
+          </Link>
+          <Link
+            href="/sign-in"
+            className="inline-block px-8 py-3.5 border border-white/30 text-white text-sm md:text-base font-medium rounded-full hover:bg-white/10 transition-colors"
+          >
+            Se connecter
+          </Link>
+        </div>
       </div>
     </section>
   )

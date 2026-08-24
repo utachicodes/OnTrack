@@ -34,13 +34,13 @@ export function Navbar({
         {/* Left — logo */}
         <a
           href="/"
-          aria-label="Aurevon home"
+          aria-label="orbite — accueil"
           className={`text-white text-xl md:text-2xl font-semibold tracking-tight z-50 transition-[transform,opacity] duration-700 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
           style={{ transitionDelay: mounted ? '0ms' : '0ms' }}
         >
-          Aurevon
+          orbite
         </a>
 
         {/* Center — desktop pill */}
@@ -48,16 +48,16 @@ export function Navbar({
           type="button"
           onClick={onToggleOverlay}
           aria-expanded={overlayOpen}
-          aria-controls="lux-overlay"
+          aria-controls="landing-overlay"
           className={`hidden md:inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 text-white/90 text-sm hover:bg-white/10 transition-[transform,opacity] duration-700 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
           style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
         >
-          {overlayOpen ? 'Close' : 'Navigate'}
+          {overlayOpen ? 'Fermer' : 'Menu'}
         </button>
 
-        {/* Right — desktop flower */}
+        {/* Right — desktop icon */}
         <div
           className={`hidden md:flex transition-[transform,opacity] duration-700 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
@@ -71,9 +71,9 @@ export function Navbar({
         <button
           type="button"
           onClick={onToggleOverlay}
-          aria-label="Toggle menu"
+          aria-label="Ouvrir le menu"
           aria-expanded={overlayOpen}
-          aria-controls="lux-overlay"
+          aria-controls="landing-overlay"
           className={`md:hidden flex flex-col items-center justify-center gap-1.5 w-8 h-8 transition-[transform,opacity] duration-700 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}

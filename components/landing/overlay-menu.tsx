@@ -3,23 +3,19 @@
 import { useEffect, useState } from 'react'
 
 const links = [
-  { label: 'Home', href: '#' },
-  { label: 'Story', href: '#' },
-  { label: 'Collection', href: '#' },
-  { label: 'Inquire', href: '#' },
+  { label: 'Tableau de bord', href: '/dashboard' },
+  { label: 'Méthode', href: '#methode' },
+  { label: 'Tuteur IA', href: '#tuteur' },
+  { label: 'Se connecter', href: '/sign-in' },
 ]
 
 export function OverlayMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
-  // Track the "shown" state with a tick so close animations can play,
-  // and stagger delays only when opening.
   const [shown, setShown] = useState(false)
 
   useEffect(() => {
     if (open) {
-      // mount immediately for the entry animation
       setShown(true)
     } else {
-      // let the exit transition complete before unmounting
       const t = window.setTimeout(() => setShown(false), 700)
       return () => window.clearTimeout(t)
     }
@@ -29,6 +25,7 @@ export function OverlayMenu({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <div
+      id="landing-overlay"
       aria-hidden={!open}
       className={`fixed inset-0 z-40 bg-black flex flex-col items-center justify-center transition-opacity duration-700 ease-overlay ${
         open ? 'opacity-100 visible' : 'opacity-0 invisible'

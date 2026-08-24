@@ -12,8 +12,9 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'Aurevon',
-  description: 'A carefully curated collection beyond compare.',
+  title: 'orbite — Ton espace pour avancer',
+  description:
+    'Tâches, examens, sessions de focus et tuteur IA — tout ce qu’il te faut pour préparer le BAC avec sérénité.',
   generator: 'next.js',
 }
 
@@ -26,7 +27,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${instrumentSerif.variable} bg-black`}>
+    <html lang="fr" className={`${instrumentSerif.variable} bg-black`}>
       <body className="antialiased bg-black text-white">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
