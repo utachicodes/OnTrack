@@ -114,12 +114,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
   const initials = userName.trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase()
 
   const [nav, setNav] = useState<NavKey>('overview')
-  const [tasks, setTasks] = useState(initialTasks)
-  const [exams, setExams] = useState(initialExams)
-  const [collapsed, setCollapsed] = useState(true)
-  const [modal, setModal] = useState<TaskKind | null>(null)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [showPush, setShowPush] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [showInstallPill, setShowInstallPill] = useState(false)
   const [activeBadge, setActiveBadge] = useState<NavKey | null>(null)
 

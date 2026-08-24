@@ -219,26 +219,30 @@ button { cursor: pointer; }
 .lux-auth-switch a:hover { border-color: #fff; }
 
 /* ===========================
-   Orbite dashboard (legacy)
+   Sidebar collapse: shrunk rail with icon-only nav.
+   =========================== */
+.app-shell.is-rail .sidebar {
+  width: 64px;
+  flex: 0 0 64px;
+  padding: 18px 10px;
+}
+.app-shell.is-rail .brand { justify-content: center; }
+.app-shell.is-rail .nav-label { display: none; }
+.app-shell.is-rail .profile-card { justify-content: center; padding: 8px; }
+.app-shell.is-rail .profile-card > div { display: none; }
+.app-shell.is-rail .nav-item { justify-content: center; padding: 0; height: 40px; gap: 0; }
+.app-shell.is-rail .nav-item .nav-label-text { display: none; }
+.app-shell.is-rail .nav-item .nav-badge-pill { display: inline-flex; }
+.app-shell.is-rail .nav-item .nav-badge { display: none; }
+.app-shell.is-rail .nav-icon { margin: 0; }
+.app-shell.is-rail .rail-toggle { display: grid; place-self: center; margin: 0 auto 14px; }
+.app-shell.is-rail .sidebar-bottom .nav-item .nav-label-text { display: none; }
+.app-shell.is-rail .sidebar-bottom .nav-item { justify-content: center; }
+
+/* ===========================
+   Aurevon luxury auth pages
    =========================== */
 .app-shell { min-height: 100vh; display: flex; background: #f5f6f8; }
-.sidebar {
-  width: 252px; flex: 0 0 252px; min-height: 100vh;
-  display: flex; flex-direction: column;
-  padding: 28px 16px 20px;
-  background: #fbfbfc; border-right: 1px solid #e8e9ee;
-}
-.brand {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0 13px 32px;
-  font: 700 21px var(--font-display); letter-spacing: -0.04em;
-}
-.brand-mark {
-  width: 29px; height: 29px; border-radius: 9px;
-  display: grid; place-items: center;
-  background: #ee705f; color: white;
-  box-shadow: 0 5px 12px rgba(238,112,95,0.27);
-}
 .profile-card {
   display: flex; align-items: center; gap: 10px;
   padding: 11px 10px; margin-bottom: 25px;

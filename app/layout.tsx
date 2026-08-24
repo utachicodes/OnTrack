@@ -62,7 +62,8 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession()
-  let themePreference: 'light' | 'dark' | 'system' = 'light'
+  // Always default to LIGHT theme. Dark is opt-in via Réglages.
+  let themePreference: 'light' | 'dark' = 'light'
   let accentColor: string = 'coral'
 
   if (session?.user?.id) {
@@ -72,7 +73,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       .where(eq(userPreferences.userId, session.user.id))
       .limit(1)
     if (rows[0]) {
-      themePreference = rows[0].themePreference
+      // Only honor saved theme if user explicitly chose dark; ignore 'system'.
+      themePreference = rows[0].themePreference === 'dark' ? 'dark' : 'light'
       accentColor = rows[0].accentColor
     }
   }
