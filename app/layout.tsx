@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Mono, Instrument_Serif } from 'next/font/google'
 import './globals.css'
 import { ThemeInit } from '@/components/theme-init'
+import { PWABootstrap } from '@/components/pwa-bootstrap'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { userPreferences } from '@/lib/db/schema'
@@ -30,17 +31,32 @@ const instrumentSerif = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  title: 'Aurevon',
+  title: 'OnTrack',
   description:
-    'Tâches, examens, sessions de focus et tuteur IA — un espace privé pour préparer le BAC avec sérénité.',
+    'Tâches, examens, sessions de focus et tuteur IA. Un espace privé pour préparer le BAC avec sérénité.',
   generator: 'next.js',
+  applicationName: 'OnTrack',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'OnTrack',
+  },
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-light-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icon-dark-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
 }
 
 export const viewport: Viewport = {
   colorScheme: 'light dark',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#000000' },
-    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f1115' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -63,8 +79,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     }
   }
 
-  // Resolve 'system' to the user's OS preference at SSR time so the first
-  // paint already matches what ThemeInit will compute client-side.
   const resolvedTheme = themePreference
 
   return (
@@ -74,9 +88,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       data-accent={accentColor}
       className={`${inter.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}
     >
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+      </head>
       <body className="antialiased">
         {children}
         <ThemeInit preference={themePreference} />
+        <PWABootstrap />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

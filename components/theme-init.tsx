@@ -9,7 +9,7 @@ declare global {
 }
 
 /**
- * ThemeInit — applies the user's theme + accent preference to <html>.
+ * ThemeInit: applies the user's theme + accent preference to <html>.
  *
  * The initial values are server-rendered onto <html data-theme data-accent>
  * in app/layout.tsx, so there is no FOUC on first paint. This component

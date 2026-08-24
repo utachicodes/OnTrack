@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, boolean, uuid, pgEnum, customType } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, integer, boolean, uuid, pgEnum, customType, uniqueIndex } from 'drizzle-orm/pg-core'
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
@@ -46,3 +46,18 @@ export const notificationPreferences = pgTable('notification_preferences', { use
 export const pushSubscriptions = pgTable('push_subscriptions', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), endpoint: text('endpoint').notNull(), p256dh: text('p256dh').notNull(), auth: text('auth').notNull(), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
 export const learningDocuments = pgTable('learning_documents', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), subject: text('subject'), filename: text('filename').notNull(), mimeType: text('mime_type').notNull(), status: text('status').notNull().default('uploaded'), data: bytea('data'), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
 export const aiConversations = pgTable('ai_conversations', { id: uuid('id').defaultRandom().primaryKey(), userId: text('user_id').notNull(), title: text('title').notNull().default('Nouvelle conversation'), subject: text('subject'), createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull() })
+
+export const lessonProgress = pgTable('lesson_progress', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull(),
+  lessonId: text('lesson_id').notNull(),
+  score: integer('score').notNull().default(0),
+  xpAwarded: integer('xp_awarded').notNull().default(0),
+  completedAt: timestamp('completed_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [uniqueIndex('lesson_progress_user_lesson_uq').on(t.userId, t.lessonId)])
+
+export const userXp = pgTable('user_xp', {
+  userId: text('user_id').primaryKey(),
+  xp: integer('xp').notNull().default(0),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+})

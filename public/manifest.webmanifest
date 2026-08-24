@@ -1,0 +1,33 @@
+{
+  "name": "OnTrack — Prépare ton BAC avec sérénité",
+  "short_name": "OnTrack",
+  "description": "Tâches, examens, sessions de focus et tuteur IA pour le BAC français.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1115",
+  "theme_color": "#ee705f",
+  "categories": ["education", "productivity"],
+  "lang": "fr",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-light-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-dark-32x32.png", "sizes": "32x32", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/apple-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Démarrer une session de focus",
+      "short_name": "Focus",
+      "url": "/dashboard",
+      "description": "Lance une session Pomodoro de 25 minutes"
+    },
+    {
+      "name": "Apprendre",
+      "short_name": "Apprendre",
+      "url": "/learn",
+      "description": "Ouvre l’académie interactive"
+    }
+  ]
+}

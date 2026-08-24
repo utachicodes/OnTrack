@@ -1,0 +1,100 @@
+// OnTrack service worker — minimal shell + offline fallback.
+// Cached pages: landing, sign-in, sign-up, legal, dashboard.
+// API calls bypass cache. Pyodide, fonts, images: stale-while-revalidate.
+const VERSION = 'ontrack-v1'
+const CORE = [
+  '/',
+  '/sign-in',
+  '/sign-up',
+  '/legal',
+  '/dashboard',
+  '/learn',
+  '/manifest.webmanifest',
+  '/icon.svg',
+  '/icon-light-32x32.png',
+]
+
+self.addEventListener('install', (event) => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(VERSION)
+    await cache.addAll(CORE).catch(() => undefined)
+    self.skipWaiting()
+  })())
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys()
+    await Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))
+    self.clients.claim()
+  })())
+})
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request
+  if (req.method !== 'GET') return
+  const url = new URL(req.url)
+  if (url.origin !== self.location.origin) return
+
+  // Never cache API, auth, push, learn-state POSTs, uploads.
+  if (url.pathname.startsWith('/api/')) return
+
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req)
+        const cache = await caches.open(VERSION)
+        cache.put(req, fresh.clone()).catch(() => undefined)
+        return fresh
+      } catch {
+        const cached = await caches.match(req)
+        if (cached) return cached
+        const fallback = await caches.match('/dashboard')
+        if (fallback) return fallback
+        return new Response('Hors ligne', { status: 503, statusText: 'offline' })
+      }
+    })())
+    return
+  }
+
+  // Stale-while-revalidate for static assets.
+  event.respondWith((async () => {
+    const cached = await caches.match(req)
+    const network = fetch(req).then((res) => {
+      if (res && res.status === 200 && res.type === 'basic') {
+        const clone = res.clone()
+        caches.open(VERSION).then((c) => c.put(req, clone)).catch(() => undefined)
+      }
+      return res
+    }).catch(() => cached)
+    return cached || network
+  })())
+})
+
+self.addEventListener('push', (event) => {
+  let payload = { title: 'OnTrack', body: 'Tu as une notification OnTrack.', url: '/dashboard' }
+  try {
+    if (event.data) payload = { ...payload, ...event.data.json() }
+  } catch { /* malformed payload */ }
+
+  event.waitUntil((async () => {
+    await self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: '/icon-light-32x32.png',
+      badge: '/icon-light-32x32.png',
+      data: { url: payload.url },
+    })
+  })())
+})
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = event.notification.data?.url ?? '/dashboard'
+  event.waitUntil((async () => {
+    const all = await clients.matchAll({ type: 'window', includeUncontrolled: true })
+    for (const client of all) {
+      if ('focus' in client) { await client.focus(); return }
+    }
+    if (clients.openWindow) await clients.openWindow(url)
+  })())
+})

@@ -28,13 +28,14 @@ const securityHeaders = [
       // 'unsafe-inline' for Next's inline boot scripts (style+script).
       // Nonce-based CSP would be stronger but requires per-request
       // middleware; deferred until we move to App Router CSP helpers.
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googletagmanager.com https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https://*.cloudfront.net https://*.public.blob.vercel-storage.com https://*.blob.vercel-storage.com",
       "media-src 'self' https://*.cloudfront.net https://*.blob.vercel-storage.com",
-      // Vercel AI Gateway (if user later swaps back) + Google Gemini endpoints
-      "connect-src 'self' https://*.googleapis.com https://generativelanguage.googleapis.com https://*.vercel.ai https://*.gateway.ai.vercel.com https://*.blob.vercel-storage.com",
+      // Pyodide runtime needs jsdelivr CDN, the .whl Python packages stream from the same origin
+      "connect-src 'self' https://*.googleapis.com https://generativelanguage.googleapis.com https://*.vercel.ai https://*.gateway.ai.vercel.com https://*.blob.vercel-storage.com https://cdn.jsdelivr.net",
+      "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

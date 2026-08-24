@@ -33,12 +33,12 @@ export function Navbar({
       <div className="max-w-[1440px] mx-auto px-6 md:px-10 flex items-center justify-between h-16 md:h-20">
         <a
           href="/"
-          aria-label="Aurevon home"
+          aria-label="OnTrack, accueil"
           className={`text-white text-xl md:text-2xl font-semibold tracking-tight z-50 transition-[transform,opacity] duration-700 ease-entrance ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
           }`}
         >
-          Aurevon
+          OnTrack
         </a>
 
         <button

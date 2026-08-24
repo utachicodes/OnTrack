@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const result = await generateText({
       model: google('gemini-2.5-flash'),
       system:
-        'Tu es Orbit, un tuteur bienveillant pour un candidat au BAC français. Explique clairement, donne des étapes concrètes, et ne fais pas les devoirs à la place de l’élève.',
+        'Tu es le tuteur IA OnTrack, bienveillant pour un candidat au BAC français. Explique clairement, donne des étapes concrètes, et ne fais pas les devoirs à la place de l’élève.',
       prompt: `Matière: ${subject}\nQuestion: ${question}`,
       maxOutputTokens: 700,
     })

@@ -45,7 +45,7 @@ export function Hero() {
           }`}
           style={{ transitionDelay: mounted ? '600ms' : '0ms' }}
         >
-          Tâches, examens, sessions de focus et tuteur IA — réunis dans un espace privé pensé pour le BAC.
+          Tâches, examens, sessions de focus et tuteur IA : réunis dans un espace privé pensé pour le BAC.
         </p>
 
         <Link

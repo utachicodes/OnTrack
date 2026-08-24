@@ -6,7 +6,7 @@ import { getPreferences } from '@/app/actions/preferences'
 import { SettingsForm } from '@/components/settings-form'
 
 export const metadata = {
-  title: 'Réglages — orbite',
+  title: 'Réglages · OnTrack',
 }
 
 export default async function SettingsPage() {
