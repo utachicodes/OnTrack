@@ -60,6 +60,17 @@ export function FlashcardsClient({ initial }: FlashcardsClientProps) {
     }
   }
 
+  async function refreshStats(tid: TrackId, cid: string | null) {
+    try {
+      const url = cid ? `/api/flashcards?trackId=${tid}&chapterId=${cid}` : `/api/flashcards?trackId=${tid}`
+      const res = await fetch(url)
+      if (!res.ok) return
+      const data = await res.json()
+      setStats(data.stats)
+      setCards(data.cards)
+    } catch { /* ignore */ }
+  }
+
   function startReviewSession(all: FlashcardRow[]) {
     const now = Date.now()
     const due = all.filter((c) => new Date(c.dueAt).getTime() <= now)
@@ -94,8 +105,8 @@ export function FlashcardsClient({ initial }: FlashcardsClientProps) {
       } else {
         // activeCardIdx stays at 0 (next card already moved into slot)
       }
-      // Reload stats
-      if (trackId) loadCards(trackId, chapterId)
+      // Reload stats without restarting the review session
+      if (trackId) refreshStats(trackId, chapterId)
     } catch {
       setError('Échec de la sauvegarde.')
     } finally {

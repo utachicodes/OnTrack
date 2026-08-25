@@ -1,12 +1,12 @@
 'use server'
 
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { exams, tasks, userPreferences } from '@/lib/db/schema'
+import { exams, tasks } from '@/lib/db/schema'
 
 async function requireUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -43,11 +43,6 @@ export async function seedStarterContent() {
       { userId, title: 'exemple — Bac blanc de Mathématiques', subject: 'Mathématiques', examAt: inDays(21), preparationPercent: 25 },
     ])
   }
-
-  // Reset any dark/system theme preference to light.
-  await db.update(userPreferences)
-    .set({ themePreference: 'light' })
-    .where(eq(userPreferences.userId, userId))
 
   revalidatePath('/dashboard')
 }

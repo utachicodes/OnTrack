@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, Check, ChevronRight, Circle, Loader2, Play, X } from 'lucide-react'
 import type { Lesson, Track } from '@/lib/curriculum'
 import { LessonDrawer } from '@/components/learn/lesson-drawer'
+import { Button } from '@/components/ui/button'
 
 interface LearnClientProps {
   tracks: Track[]
