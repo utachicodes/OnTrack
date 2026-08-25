@@ -7,6 +7,8 @@ import { ExamenBlancClient } from '@/components/learn/examen-blanc-client'
 import { db } from '@/lib/db'
 import { mockExams } from '@/lib/db/schema'
 import { desc, eq } from 'drizzle-orm'
+import { BAC_TRACKS, type TrackId } from '@/lib/bac-curriculum'
+import { questionsByTrack } from '@/lib/bac-questions'
 
 export const metadata = {
   title: 'Examen blanc · OnTrack',
@@ -27,6 +29,20 @@ export default async function ExamenBlancPage() {
 
   const past = await loadHistory(session.user.id)
 
+  // Compute lastByTrack server-side so the sidebar shows scores on initial load.
+  const lastByTrack: Record<string, { score: number; date: string }> = {}
+  for (const exam of past) {
+    if (!lastByTrack[exam.trackId]) {
+      lastByTrack[exam.trackId] = { score: exam.score ?? 0, date: exam.startedAt.toISOString() }
+    }
+  }
+
+  // Compute pool sizes server-side (answers never leave the server).
+  const poolSizes: Record<string, number> = {}
+  for (const t of BAC_TRACKS) {
+    poolSizes[t.id] = questionsByTrack(t.id as TrackId).length
+  }
+
   return (
     <main className="learn-page">
       <header className="learn-header">
@@ -39,7 +55,7 @@ export default async function ExamenBlancPage() {
       <div className="learn-shell">
         <ExamenBlancClient
           initial={{
-            poolSize: 999,
+            poolSizes,
             past: past.map((e) => ({
               id: e.id,
               trackId: e.trackId,
@@ -49,7 +65,7 @@ export default async function ExamenBlancPage() {
               startedAt: e.startedAt.toISOString(),
               completedAt: e.completedAt?.toISOString() ?? null,
             })),
-            lastByTrack: {},
+            lastByTrack,
           }}
         />
       </div>

@@ -1,11 +1,11 @@
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { mockExamResponses, mockExams } from '@/lib/db/schema'
 import { ALL_QUESTIONS, questionsByTrack, shuffleQuestions, questionById, type Question } from '@/lib/bac-questions'
-import { trackById, type TrackId } from '@/lib/bac-curriculum'
+import { BAC_TRACKS, trackById, type TrackId } from '@/lib/bac-curriculum'
 
 async function getUserId() {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -19,7 +19,7 @@ function readTrackId(value: unknown): TrackId | null {
 }
 
 /** GET /api/examen-blanc?trackId=...&limit=20
- *  Returns: { tracks: [...], examCount, lastScore } */
+ *  Returns: { tracks: [...], poolSizes, examCount, lastScore } */
 export async function GET(request: Request) {
   const userId = await getUserId()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -27,18 +27,21 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const trackId = readTrackId(url.searchParams.get('trackId'))
 
-  const [past, pool] = await Promise.all([
-    db.select().from(mockExams).where(eq(mockExams.userId, userId)).orderBy(desc(mockExams.startedAt)).limit(10),
-    Promise.resolve(trackId ? questionsByTrack(trackId) : ALL_QUESTIONS),
-  ])
+  const past = await db.select().from(mockExams).where(eq(mockExams.userId, userId)).orderBy(desc(mockExams.startedAt)).limit(10)
 
   const lastByTrack = new Map<string, { score: number; date: Date }>()
   for (const exam of past) {
     if (!lastByTrack.has(exam.trackId)) lastByTrack.set(exam.trackId, { score: exam.score ?? 0, date: exam.startedAt })
   }
 
+  // Compute pool sizes per track server-side (no answers leaked).
+  const poolSizes: Record<string, number> = {}
+  for (const t of BAC_TRACKS) {
+    poolSizes[t.id] = questionsByTrack(t.id as TrackId).length
+  }
+
   return NextResponse.json({
-    poolSize: pool.length,
+    poolSizes,
     past: past.map((e) => ({ id: e.id, trackId: e.trackId, score: e.score, total: e.totalQuestions, status: e.status, startedAt: e.startedAt, completedAt: e.completedAt })),
     lastByTrack: Object.fromEntries(lastByTrack),
   })
@@ -123,7 +126,7 @@ export async function PATCH(request: Request) {
       })),
     ).onConflictDoUpdate({
       target: [mockExamResponses.examId, mockExamResponses.questionId],
-      set: { response: responses as any, correct: responses as any } as never,
+      set: { response: sql`excluded.response`, correct: sql`excluded.correct` },
     })
   }
 

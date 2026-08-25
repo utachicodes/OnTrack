@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { IconArrow, IconCheck, IconChevron, IconClose, IconSparkles } from '@/components/icons'
 import { BAC_TRACKS, type TrackId } from '@/lib/bac-curriculum'
-import { questionsByTrack } from '@/lib/bac-questions'
 
 interface Question {
   id: string
@@ -37,7 +36,7 @@ interface Detail {
 
 interface ExamClientProps {
   initial: {
-    poolSize: number
+    poolSizes: Record<string, number>
     past: PastExam[]
     lastByTrack: Record<string, { score: number; date: string }>
   }
@@ -55,6 +54,7 @@ export function ExamenBlancClient({ initial }: ExamClientProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [remainingSec, setRemainingSec] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const [poolSizes, setPoolSizes] = useState<Record<string, number>>(initial.poolSizes)
   const [results, setResults] = useState<{
     score: number
     total: number
@@ -63,7 +63,17 @@ export function ExamenBlancClient({ initial }: ExamClientProps) {
   } | null>(null)
   const [past, setPast] = useState<PastExam[]>(initial.past)
 
-  const pool = useMemo(() => questionsByTrack(trackId), [trackId])
+  // Fetch fresh pool sizes on mount (server-provided ones may be stale if questions changed)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/examen-blanc')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (!cancelled && d?.poolSizes) setPoolSizes(d.poolSizes) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+
+  const poolLength = poolSizes[trackId] ?? 0
   const track = useMemo(() => BAC_TRACKS.find((t) => t.id === trackId)!, [trackId])
 
   // Timer
@@ -109,7 +119,7 @@ export function ExamenBlancClient({ initial }: ExamClientProps) {
       setPhase('results')
       // Refresh history
       fetch('/api/examen-blanc').then((r) => r.ok ? r.json() : null).then((d) => {
-        if (d) setPast(d.past)
+        if (d) { setPast(d.past); if (d.poolSizes) setPoolSizes(d.poolSizes) }
       })
     } finally {
       setSubmitting(false)
@@ -170,7 +180,7 @@ export function ExamenBlancClient({ initial }: ExamClientProps) {
               <p className="eyebrow">Examen blanc</p>
               <h1>{track.title}</h1>
               <p className="subhead">
-                {pool.length} questions disponibles · génère un sujet chronométré, mélange les questions,
+                {poolLength} questions disponibles · génère un sujet chronométré, mélange les questions,
                 note tes réponses puis obtiens un score détaillé avec explications et corrections.
               </p>
             </div>
@@ -199,11 +209,11 @@ export function ExamenBlancClient({ initial }: ExamClientProps) {
             </div>
 
             <div className="exam-config-cta">
-              <button className="primary-button" onClick={start} disabled={pool.length < count}>
-                <IconSparkles size={16} /> Démarrer l’examen blanc
+              <button className="primary-button" onClick={start} disabled={poolLength < count}>
+                <IconSparkles size={16} /> Démarrer l&apos;examen blanc
               </button>
-              {pool.length < count && (
-                <p className="empty-line">Pas assez de questions ({pool.length}) dans ce pool.</p>
+              {poolLength < count && (
+                <p className="empty-line">Pas assez de questions ({poolLength}) dans ce pool.</p>
               )}
             </div>
           </div>
