@@ -1,7 +1,6 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { auth } from '@/lib/auth'
@@ -15,7 +14,7 @@ type ThemePreference = (typeof VALID_THEMES)[number]
 type AccentColor = (typeof VALID_ACCENTS)[number]
 
 async function requireUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user?.id) redirect('/sign-in')
   return session.user.id
 }
@@ -46,7 +45,7 @@ export async function updatePreferences(formData: FormData) {
 }
 
 export async function getPreferences() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user?.id) return null
   const rows = await db
     .select()

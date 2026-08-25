@@ -1,14 +1,13 @@
 'use server'
 
 import { and, desc, eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { aiConversations } from '@/lib/db/schema'
 
 async function requireUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user?.id) redirect('/sign-in')
   return session.user.id
 }
