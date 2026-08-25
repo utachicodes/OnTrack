@@ -14,6 +14,17 @@ async function requireUserId() {
   return session.user.id
 }
 
+export async function getActiveFocusSession() {
+  const userId = await requireUserId()
+  const rows = await db
+    .select()
+    .from(focusSessions)
+    .where(and(eq(focusSessions.userId, userId), eq(focusSessions.status, 'active')))
+    .orderBy(desc(focusSessions.startedAt))
+    .limit(1)
+  return rows[0] ?? null
+}
+
 export async function listFocusSessions(limit = 20) {
   const userId = await requireUserId()
   return db

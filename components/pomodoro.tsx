@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { IconCheck, IconReset, IconHourglass } from '@/components/icons'
-import { startFocusSession, completeFocusSession } from '@/app/actions/focus'
+import { startFocusSession, completeFocusSession, getActiveFocusSession } from '@/app/actions/focus'
+import { Button } from '@/components/ui/button'
 
 interface FocusSessionRow {
   id: string
@@ -18,11 +19,27 @@ function formatTime(seconds: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
-export function Pomodoro({ defaultMinutes = 25 }: { defaultMinutes?: number }) {
+export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?: number; onComplete?: () => void }) {
   const [active, setActive] = useState<FocusSessionRow | null>(null)
   const [remaining, setRemaining] = useState(defaultMinutes * 60)
   const [completed, setCompleted] = useState(0)
   const intervalRef = useRef<TimerId | null>(null)
+
+  // On mount, check for an active session in the DB and resume it.
+  useEffect(() => {
+    let cancelled = false
+    getActiveFocusSession().then((row) => {
+      if (cancelled || !row || !row.startedAt) return
+      const startedMs = new Date(row.startedAt!).getTime()
+      const elapsedSec = Math.floor((Date.now() - startedMs) / 1000)
+      const totalSec = row.durationMinutes * 60
+      const remainingSec = Math.max(0, totalSec - elapsedSec)
+      setActive({ id: row.id, durationMinutes: row.durationMinutes, startedAt: new Date(row.startedAt!) })
+      setRemaining(remainingSec > 0 ? remainingSec : 0)
+    }).catch(() => { /* ignore */ })
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => () => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -67,7 +84,10 @@ export function Pomodoro({ defaultMinutes = 25 }: { defaultMinutes?: number }) {
     await completeFocusSession(active.id, status)
     setActive(null)
     setRemaining(defaultMinutes * 60)
-    if (status === 'completed') setCompleted((c) => c + 1)
+    if (status === 'completed') {
+      setCompleted((c) => c + 1)
+      onComplete?.()
+    }
     try {
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('Session de focus terminée', {
@@ -93,23 +113,23 @@ export function Pomodoro({ defaultMinutes = 25 }: { defaultMinutes?: number }) {
       </div>
       <div className="pomodoro-actions">
         {!active && (
-          <button className="primary-button" onClick={start}>
+          <Button variant="default" size="lg" onClick={start}>
             <IconHourglass size={16} /> Démarrer {defaultMinutes} min
-          </button>
+          </Button>
         )}
         {active && (
-          <button className="primary-button" onClick={() => finish('completed')}>
+          <Button variant="default" size="lg" onClick={() => finish('completed')}>
             <IconCheck size={16} /> Terminer
-          </button>
+          </Button>
         )}
         {active && (
-          <button className="ghost-button" onClick={() => finish('cancelled')}>
+          <Button variant="ghost" size="lg" onClick={() => finish('cancelled')}>
             <IconReset size={15} /> Annuler
-          </button>
+          </Button>
         )}
       </div>
       <p className="pomodoro-meta">
-        <strong>{completed}</strong> session{completed > 1 ? 's' : ''} terminée{completed > 1 ? 's' : ''} aujourd&rsquo;hui
+        <strong>{completed}</strong> session{completed > 1 ? 's' : ''} terminée{completed > 1 ? 's' : ''} aujourd&apos;hui
       </p>
     </div>
   )
