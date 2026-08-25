@@ -1,11 +1,10 @@
 import { google } from '@ai-sdk/google'
 import { generateText } from 'ai'
-import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))

@@ -1,5 +1,4 @@
 import { and, eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -10,7 +9,7 @@ const MAX_FILE_SIZE = 4 * 1024 * 1024
 const ALLOWED_TYPES = new Set(['application/pdf', 'text/plain', 'text/markdown'])
 
 export async function POST(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const formData = await request.formData()
@@ -34,14 +33,14 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const documents = await db.select({ id: learningDocuments.id, filename: learningDocuments.filename, subject: learningDocuments.subject, status: learningDocuments.status, createdAt: learningDocuments.createdAt }).from(learningDocuments).where(and(eq(learningDocuments.userId, session.user.id))).orderBy(learningDocuments.createdAt)
   return NextResponse.json({ documents })
 }
 
 export async function DELETE(request: Request) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await request.json().catch(() => ({}))
   if (typeof id !== 'string' || !id) return NextResponse.json({ error: 'Document id is required' }, { status: 400 })

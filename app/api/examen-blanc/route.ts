@@ -1,5 +1,4 @@
 import { and, desc, eq, sql } from 'drizzle-orm'
-import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -8,7 +7,7 @@ import { ALL_QUESTIONS, questionsByTrack, shuffleQuestions, questionById, type Q
 import { BAC_TRACKS, trackById, type TrackId } from '@/lib/bac-curriculum'
 
 async function getUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   return session?.user?.id ?? null
 }
 

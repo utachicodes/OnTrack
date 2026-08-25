@@ -1,5 +1,4 @@
 import { and, asc, eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -9,7 +8,7 @@ import { chapterById, trackById, type TrackId } from '@/lib/bac-curriculum'
 import { seedCardsFor } from '@/lib/seed-flashcards'
 
 async function getUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const { data: session } = await auth.getSession()
   return session?.user?.id ?? null
 }
 
