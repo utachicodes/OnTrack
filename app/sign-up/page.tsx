@@ -1,17 +1,11 @@
 import Link from 'next/link'
-import { ArrowLeft, Check, CalendarDays, Focus, Sparkles } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { AuthForm } from '@/components/auth-form'
+import { AUTH_PERKS } from '@/lib/auth-perks'
 
 export const metadata = {
   title: 'Créer un compte · OnTrack',
 }
-
-const perks = [
-  { icon: Check, text: 'Des tâches claires, par matière et par priorité.' },
-  { icon: CalendarDays, text: 'Le compte à rebours de tes examens, sans anxiété.' },
-  { icon: Focus, text: 'Des sessions Pomodoro pour travailler vraiment.' },
-  { icon: Sparkles, text: 'Un tuteur IA qui explique, jamais à ta place.' },
-]
 
 export default function SignUpPage() {
   return (
@@ -30,7 +24,7 @@ export default function SignUpPage() {
             Crée ton espace en 30 secondes. Tâches, examens, focus et tuteur IA : tout y est.
           </p>
           <ul className="auth-perks">
-            {perks.map(({ icon: Icon, text }) => (
+            {AUTH_PERKS.map(({ icon: Icon, text }) => (
               <li key={text}>
                 <span className="auth-perk-icon"><Icon size={15} aria-hidden="true" /></span>
                 <span>{text}</span>
@@ -44,7 +38,7 @@ export default function SignUpPage() {
 
       <section className="auth-main">
         <Link href="/" className="auth-back">
-          <ArrowLeft size={14} aria-hidden="true" /> Retour à l’accueil
+          <ArrowLeft size={14} aria-hidden="true" /> Retour à l&apos;accueil
         </Link>
 
         <div className="auth-card">

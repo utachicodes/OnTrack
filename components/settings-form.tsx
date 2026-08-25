@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { updatePreferences } from '@/app/actions/preferences'
+import { Button } from '@/components/ui/button'
 
 const THEMES = [
   { value: 'light', label: 'Clair', desc: 'Fond clair, texte sombre.' },
@@ -79,7 +80,7 @@ export function SettingsForm({
       </fieldset>
 
       <fieldset className="settings-group">
-        <legend className="settings-group-title">Couleur d’accent</legend>
+        <legend className="settings-group-title">Couleur d&apos;accent</legend>
         <div className="settings-accents">
           {ACCENTS.map((a) => (
             <label
@@ -102,14 +103,15 @@ export function SettingsForm({
       </fieldset>
 
       <div className="settings-actions">
-        <button
+        <Button
           type="submit"
-          className="lux-auth-submit"
+          variant="default"
+          size="lg"
           disabled={!dirty || pending}
-          style={{ maxWidth: 320 }}
+          className="max-w-[320px]"
         >
           {pending ? 'Enregistrement…' : saved ? 'Enregistré ✓' : 'Enregistrer'}
-        </button>
+        </Button>
         <span className="settings-hint">Connecté en tant que {userName}</span>
       </div>
     </form>
