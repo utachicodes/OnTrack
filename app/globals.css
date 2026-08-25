@@ -802,10 +802,10 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   gap: 12px;
   color: #f4f5f7;
   text-decoration: none;
-  font-family: var(--font-instrument), 'Instrument Serif', Georgia, serif;
-  font-size: 20px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   align-self: flex-start;
 }
 .auth-brand:hover { color: #f4f5f7; }
@@ -854,10 +854,10 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
 .auth-head { display: flex; flex-direction: column; gap: 8px; }
 .auth-head h1 {
   margin: 0;
-  font-family: var(--font-instrument), 'Instrument Serif', Georgia, serif;
-  font-weight: 400;
-  font-size: clamp(38px, 4.5vw, 56px);
-  line-height: 1.02;
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, 4.2vw, 48px);
+  line-height: 1.05;
   letter-spacing: -0.025em;
   color: #f4f5f7;
 }
