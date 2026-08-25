@@ -887,6 +887,47 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   flex-direction: column;
   gap: 14px;
 }
+.auth-google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 18px;
+  border: 1px solid #232732;
+  border-radius: 12px;
+  background: #11141b;
+  color: #f4f5f7;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.auth-google-btn:hover:not(:disabled) {
+  border-color: #2f3340;
+  background: #14171f;
+}
+.auth-google-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 0;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #232732;
+}
+.auth-divider span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5f6473;
+}
 .auth-field { display: flex; flex-direction: column; gap: 6px; }
 .auth-field > span {
   font-family: var(--font-mono);
