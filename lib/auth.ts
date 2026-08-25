@@ -37,9 +37,9 @@ export const auth = betterAuth({
       : []),
   ] as string[],
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
-  ...(process.env.NODE_ENV === 'development'
-    ? { advanced: { defaultCookieAttributes: { sameSite: 'none' as const, secure: true } } }
-    : {}),
+  // Note: previous dev override (sameSite: 'none', secure: true) silently broke
+  // sign-in on http://localhost because modern browsers drop `secure` cookies over
+  // http. better-auth defaults to `lax` + http, which works for same-origin dev.
 })
 
 export async function getSession() {
