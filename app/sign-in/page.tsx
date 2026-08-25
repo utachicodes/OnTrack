@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
 import { AuthForm } from '@/components/auth-form'
-import { AUTH_PERKS } from '@/lib/auth-perks'
+import { AuthColumnsArt } from '@/components/auth-columns-art'
 
 export const metadata = {
   title: 'Connexion · OnTrack',
@@ -10,40 +9,14 @@ export const metadata = {
 export default function SignInPage() {
   return (
     <main className="auth-page">
-      <section className="auth-side" aria-hidden="true">
-        <Link href="/" className="auth-brand">OnTrack</Link>
-
-        <div className="auth-pitch">
-          <p className="auth-eyebrow">Espace privé · BAC 2026</p>
-          <h2 className="auth-pitch-title">
-            Prépare ton BAC,
-            <br />
-            <em>pas la panique.</em>
-          </h2>
-          <p className="auth-pitch-sub">
-            Retrouve ton planning, tes tâches et ton tuteur IA exactement où tu les as laissés.
-          </p>
-          <ul className="auth-perks">
-            {AUTH_PERKS.map(({ icon: Icon, text }) => (
-              <li key={text}>
-                <span className="auth-perk-icon"><Icon size={15} aria-hidden="true" /></span>
-                <span>{text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <p className="auth-fineprint">Gratuit · Sans carte bancaire</p>
-      </section>
-
-      <section className="auth-main">
-        <Link href="/" className="auth-back">
-          <ArrowLeft size={14} aria-hidden="true" /> Retour à l&apos;accueil
+      <section className="auth-form-pane">
+        <Link href="/" className="auth-brand">
+          <span className="auth-brand-mark" aria-hidden="true" />
+          <span className="auth-brand-text">OnTrack</span>
         </Link>
 
         <div className="auth-card">
-          <Link href="/" className="auth-brand auth-brand-mobile">OnTrack</Link>
-
+          <p className="auth-eyebrow">Espace privé · BAC 2026</p>
           <header className="auth-head">
             <h1>
               Bon retour<span>.</span>
@@ -57,7 +30,13 @@ export default function SignInPage() {
             Nouveau sur OnTrack ? <Link href="/sign-up">Créer un compte</Link>
           </p>
         </div>
+
+        <p className="auth-fineprint">© OnTrack · Prépare ton BAC, pas la panique.</p>
       </section>
+
+      <aside className="auth-art-pane" aria-hidden="true">
+        <AuthColumnsArt />
+      </aside>
     </main>
   )
 }
