@@ -6,6 +6,8 @@ import { tasks, exams, focusSessions } from '@/lib/db/schema'
 import { DashboardClient } from '@/components/dashboard-client'
 import { seedStarterContent } from '@/app/actions/seed'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Tableau de bord · OnTrack',
 }
