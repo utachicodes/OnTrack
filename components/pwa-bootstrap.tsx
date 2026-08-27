@@ -29,6 +29,8 @@ function isStandalone() {
   )
 }
 
+const INSTALL_SEEN_KEY = 'ontrack-install-prompt-seen'
+
 export function PWABootstrap() {
   const [open, setOpen] = useState(false)
   const [ios, setIos] = useState(false)
@@ -48,8 +50,10 @@ export function PWABootstrap() {
     }
 
     const handler = (e: BeforeInstallPromptEvent) => {
+      if (window.localStorage.getItem(INSTALL_SEEN_KEY)) return
       e.preventDefault()
       window.__deferredInstallPrompt = e
+      window.localStorage.setItem(INSTALL_SEEN_KEY, '1')
       setShowSteps(false)
       setOpen(true)
     }
@@ -64,7 +68,8 @@ export function PWABootstrap() {
 
     // iOS never fires "beforeinstallprompt" — show the modal once so the
     // user learns about the Share → Add to Home Screen flow.
-    if (isIos && !window.localStorage.getItem('ontrack-ios-hint-seen')) {
+    if (isIos && !window.localStorage.getItem(INSTALL_SEEN_KEY)) {
+      window.localStorage.setItem(INSTALL_SEEN_KEY, '1')
       setOpen(true)
     }
 
@@ -95,7 +100,7 @@ export function PWABootstrap() {
   }
 
   const later = () => {
-    window.localStorage.setItem('ontrack-ios-hint-seen', '1')
+    window.localStorage.setItem(INSTALL_SEEN_KEY, '1')
     setOpen(false)
     setShowSteps(false)
   }
