@@ -765,79 +765,59 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
    Mobile: collapses to single column, illustration hides.
    ============================================================ */
 
-/* --- Shell: viewport panel --- */
+/* --- Shell: full-page split --- */
 .auth-page {
   min-height: 100dvh;
   display: grid;
-  place-items: center;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   background:
     radial-gradient(900px 520px at 12% -8%, rgba(238, 112, 95, 0.14), transparent 60%),
     radial-gradient(900px 520px at 96% 108%, rgba(99, 102, 241, 0.12), transparent 60%),
     #0a0c10;
   color: #f4f5f7;
   font-family: var(--font-sans);
-  padding: 40px 20px;
+}
+@media (max-width: 1000px) {
+  .auth-page { grid-template-columns: 1fr; }
 }
 
-/* --- Centered pane: brand + form --- */
-.auth-form-pane {
+/* --- Left pane: brand + pitch --- */
+.auth-aside {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 440px;
+  justify-content: space-between;
+  padding: 48px clamp(24px, 5vw, 72px);
+  border-right: 1px solid #1c1f29;
+}
+@media (max-width: 1000px) {
+  .auth-aside { border-right: 0; border-bottom: 1px solid #1c1f29; gap: 24px; }
 }
 
 .auth-brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
   color: #f4f5f7;
   text-decoration: none;
   font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 32px;
-}
-.auth-brand:hover { color: #f4f5f7; }
-.auth-brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 1.5px solid #f4f5f7;
-  position: relative;
-  display: inline-block;
-  flex-shrink: 0;
-}
-/* Slash inside the brand mark — distinctive monogram, no asset needed */
-.auth-brand-mark::after {
-  content: "";
-  position: absolute;
-  inset: 4px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, transparent 42%, #f4f5f7 42%, #f4f5f7 46%, transparent 46%,
-                                       transparent 54%, #f4f5f7 54%, #f4f5f7 58%, transparent 58%);
-  transform: rotate(-30deg);
 }
 
-.auth-card {
-  width: 100%;
+.auth-aside-content {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid #1c1f29;
-  border-radius: 20px;
-  padding: 36px 32px 32px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  gap: 16px;
+  max-width: 440px;
+  margin: 24px 0;
 }
 @media (max-width: 1000px) {
-  .auth-card { padding: 28px 22px 26px; }
+  .auth-aside-content { margin: 16px 0 8px; }
 }
 
 .auth-eyebrow {
-  margin: 0 0 10px;
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.18em;
@@ -845,8 +825,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   color: #8a8f9d;
 }
 
-.auth-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-.auth-head h1 {
+.auth-aside h1 {
   margin: 0;
   font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-weight: 700;
@@ -855,37 +834,63 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   letter-spacing: -0.025em;
   color: #f4f5f7;
 }
-.auth-head h1 span {
+.auth-aside h1 span {
   color: #ee705f;
   font-style: italic;
 }
-.auth-head p {
+
+.auth-aside-copy {
   margin: 0;
   color: #a4a8b5;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .auth-fineprint {
-  margin: 24px 0 0;
+  margin: 0;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
   color: #5f6473;
-  align-self: center;
+}
+
+/* --- Right pane: form --- */
+.auth-form-pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 5vw, 72px);
+}
+@media (max-width: 1000px) {
+  .auth-form-pane { align-items: flex-start; }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* --- Form (kept stable: same classes the component already uses) --- */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+.auth-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 .auth-google-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  width: 100%;
   height: 50px;
   padding: 0 18px;
   border: 1px solid #232732;
@@ -922,7 +927,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   text-transform: uppercase;
   color: #5f6473;
 }
-.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-field { display: flex; flex-direction: column; gap: 8px; }
 .auth-field > span {
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1002,9 +1007,10 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   align-items: center;
   justify-content: center;
   gap: 8px;
+  width: 100%;
   height: 50px;
   padding: 0 18px;
-  margin-top: 6px;
+  margin-top: 4px;
   border: 0;
   border-radius: 12px;
   background: #f4f5f7;
@@ -1037,13 +1043,14 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
 @keyframes auth-spin { to { transform: rotate(360deg); } }
 
 .auth-hint {
-  margin: -2px 0 0;
+  margin: 0;
   text-align: center;
   color: #8a8f9d;
   font-size: 12px;
+  line-height: 1.6;
 }
 .auth-switch {
-  margin: 24px 0 0;
+  margin: 0;
   text-align: center;
   color: #a4a8b5;
   font-size: 13px;
@@ -1057,25 +1064,6 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   transition: color 160ms ease, border-color 160ms ease;
 }
 .auth-switch a:hover { color: #ee705f; border-color: #ee705f; }
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #5f6473;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  margin: 4px 0;
-}
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #232732;
-}
 
 .auth-footnote {
   margin: 0;
@@ -1784,55 +1772,45 @@ html[data-theme="dark"] .badge small { color: #a4a8b5; }
 html[data-theme="dark"] .pip { background: #2b2e38; }
 
 /* ============================================================
-   PWA floating install button (low z-index to never block)
+   PWA install modal
    ============================================================ */
-.pwa-floating {
+.pwa-modal-backdrop {
   position: fixed;
-  bottom: 18px;
-  right: 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 18px;
-  border: 0;
-  border-radius: 999px;
-  background: #111315;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  box-shadow: 0 12px 30px rgba(15, 17, 21, 0.35);
-  cursor: pointer;
-  z-index: 50;
-  transition: transform 160ms ease;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(8, 10, 14, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 100;
 }
-.pwa-floating:hover { transform: translateY(-1px); }
-html[data-theme="dark"] .pwa-floating { background: #f4f5f7; color: #111315; }
-@media (max-width: 640px) {
-  .pwa-floating { left: 18px; right: 18px; justify-content: center; }
-}
-.pwa-ios-hint {
-  position: fixed;
-  bottom: 18px;
-  right: 18px;
-  left: 18px;
-  max-width: 380px;
-  margin: 0 auto;
+.pwa-modal {
+  width: 100%;
+  max-width: 360px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 12px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: #111315;
-  color: #fff;
-  font-size: 13px;
-  line-height: 1.5;
-  box-shadow: 0 12px 30px rgba(15, 17, 21, 0.35);
-  z-index: 50;
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: #11141b;
+  border: 1px solid #232732;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
 }
-.pwa-ios-hint p { margin: 0; }
-.pwa-ios-hint strong { color: #ee705f; }
+.pwa-modal h2 {
+  margin: 0;
+  font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #f4f5f7;
+}
+.pwa-modal-text {
+  margin: 0;
+  color: #a4a8b5;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.pwa-modal-text strong { color: #f4f5f7; }
 .pwa-ios-share {
   display: inline-flex;
   align-items: center;
@@ -1843,22 +1821,47 @@ html[data-theme="dark"] .pwa-floating { background: #f4f5f7; color: #111315; }
   background: rgba(255, 255, 255, 0.14);
   font-size: 12px;
   line-height: 1;
+  vertical-align: -2px;
 }
-.pwa-ios-close {
-  border: 0;
-  background: none;
-  color: #a4a8b5;
-  font-size: 18px;
-  line-height: 1;
+.pwa-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.pwa-modal-primary,
+.pwa-modal-secondary {
+  height: 46px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 0 2px;
-  flex-shrink: 0;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+  flex: 1;
 }
-.pwa-ios-close:hover { color: #fff; }
-html[data-theme="dark"] .pwa-ios-hint { background: #f4f5f7; color: #111315; }
-html[data-theme="dark"] .pwa-ios-hint strong { color: #d9503f; }
-html[data-theme="dark"] .pwa-ios-close { color: #8a8f9d; }
-html[data-theme="dark"] .pwa-ios-close:hover { color: #111315; }
+.pwa-modal-primary {
+  border: 0;
+  background: #f4f5f7;
+  color: #0a0c10;
+}
+.pwa-modal-primary:hover { background: #ffffff; transform: translateY(-1px); }
+.pwa-modal-secondary {
+  border: 1px solid #232732;
+  background: transparent;
+  color: #a4a8b5;
+}
+.pwa-modal-secondary:hover {
+  border-color: #2f3340;
+  color: #f4f5f7;
+  background: #14171f;
+}
+html[data-theme="dark"] .pwa-modal { background: #f4f5f7; border-color: #e1e3e8; }
+html[data-theme="dark"] .pwa-modal h2 { color: #111315; }
+html[data-theme="dark"] .pwa-modal-text { color: #6b7180; }
+html[data-theme="dark"] .pwa-modal-text strong { color: #111315; }
+html[data-theme="dark"] .pwa-modal-primary { background: #111315; color: #f4f5f7; }
+html[data-theme="dark"] .pwa-modal-primary:hover { background: #1c1f29; }
+html[data-theme="dark"] .pwa-modal-secondary { border-color: #d5d7dd; color: #6b7180; }
+html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; color: #111315; }
 
 /* ============================================================
    Flashcards + Mock exam pages

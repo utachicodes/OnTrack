@@ -30,12 +30,11 @@ function isStandalone() {
 }
 
 export function PWABootstrap() {
-  const [showInstaller, setShowInstaller] = useState(false)
-  const [showIosHint, setShowIosHint] = useState(false)
+  const [open, setOpen] = useState(false)
   const [ios, setIos] = useState(false)
+  const [showSteps, setShowSteps] = useState(false)
 
   useEffect(() => {
-    // Already installed as a PWA — nothing to do.
     if (isStandalone()) {
       navigator.serviceWorker?.register?.('/sw.js').catch(() => undefined)
       return
@@ -51,33 +50,22 @@ export function PWABootstrap() {
     const handler = (e: BeforeInstallPromptEvent) => {
       e.preventDefault()
       window.__deferredInstallPrompt = e
-      setShowInstaller(true)
+      setShowSteps(false)
+      setOpen(true)
     }
 
-    const trigger = async () => {
-      if (isIos) {
-        setShowIosHint(true)
-        return
-      }
-      const prompt = window.__deferredInstallPrompt
-      if (!prompt) return
-      await prompt.prompt()
-      try {
-        await prompt.userChoice
-      } catch {
-        /* ignore */
-      }
-      window.__deferredInstallPrompt = undefined
-      setShowInstaller(false)
+    const trigger = () => {
+      setShowSteps(false)
+      setOpen(true)
     }
 
     window.addEventListener('beforeinstallprompt', handler)
     window.addEventListener('show-install', trigger as EventListener)
 
-    // iOS Safari never fires "beforeinstallprompt" — show a hint button
-    // that explains the Share → Add to Home Screen flow.
+    // iOS never fires "beforeinstallprompt" — show the modal once so the
+    // user learns about the Share → Add to Home Screen flow.
     if (isIos && !window.localStorage.getItem('ontrack-ios-hint-seen')) {
-      setShowInstaller(true)
+      setOpen(true)
     }
 
     return () => {
@@ -86,41 +74,68 @@ export function PWABootstrap() {
     }
   }, [])
 
-  const openIosHint = () => {
+  const close = () => setOpen(false)
+
+  const install = async () => {
+    if (ios) {
+      // No programmatic install on iOS — walk through the share flow.
+      setShowSteps(true)
+      return
+    }
+    const prompt = window.__deferredInstallPrompt
+    if (!prompt) return
+    await prompt.prompt()
+    try {
+      await prompt.userChoice
+    } catch {
+      /* ignore */
+    }
+    window.__deferredInstallPrompt = undefined
+    setOpen(false)
+  }
+
+  const later = () => {
     window.localStorage.setItem('ontrack-ios-hint-seen', '1')
-    setShowInstaller(false)
-    setShowIosHint(true)
+    setOpen(false)
+    setShowSteps(false)
   }
 
-  if (showIosHint) {
-    return (
-      <div className="pwa-ios-hint" role="dialog" aria-label="Installer OnTrack sur iPhone">
-        <p>
-          Sur iPhone : touche <strong>Partager</strong>{' '}
-          <span className="pwa-ios-share" aria-hidden="true">⎋</span>, puis{' '}
-          <strong>Sur l’écran d’accueil</strong>.
-        </p>
-        <button
-          type="button"
-          className="pwa-ios-close"
-          onClick={() => setShowIosHint(false)}
-          aria-label="Fermer"
-        >
-          ×
-        </button>
-      </div>
-    )
-  }
-
-  if (!showInstaller) return null
+  if (!open) return null
 
   return (
-    <button
-      className="pwa-floating"
-      onClick={ios ? openIosHint : undefined}
-      aria-label="Installer OnTrack"
-    >
-      Installer l’app
-    </button>
+    <div className="pwa-modal-backdrop" role="dialog" aria-modal="true" aria-label="Installer OnTrack">
+      <div className="pwa-modal">
+        {showSteps ? (
+          <>
+            <h2>Installer OnTrack sur iPhone</h2>
+            <p className="pwa-modal-text">
+              Touche <strong>Partager</strong>{' '}
+              <span className="pwa-ios-share" aria-hidden="true">⎋</span>, puis{' '}
+              <strong>Sur l’écran d’accueil</strong>.
+            </p>
+            <div className="pwa-modal-actions">
+              <button type="button" className="pwa-modal-primary" onClick={close}>
+                Compris
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>Installez OnTrack</h2>
+            <p className="pwa-modal-text">
+              Accédez rapidement à vos tâches, vos examens et votre espace depuis votre écran d’accueil.
+            </p>
+            <div className="pwa-modal-actions">
+              <button type="button" className="pwa-modal-primary" onClick={install}>
+                Installer
+              </button>
+              <button type="button" className="pwa-modal-secondary" onClick={later}>
+                Plus tard
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   )
 }
