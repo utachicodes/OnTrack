@@ -17,6 +17,11 @@ function getAuth(): NeonAuth | null {
 
 export const auth = new Proxy({} as NeonAuth, {
   get(_target, prop) {
+    if (process.env.MOCK_AUTH === 'true' && prop === 'getSession') {
+      return async () => ({
+        data: { user: { id: 'test-user-id', email: 'test@ontrack.app', name: 'Test User' } },
+      })
+    }
     const real = getAuth()
     if (!real) throw new Error('Neon Auth is not configured')
     const value = (real as Record<string, unknown>)[prop as string]
