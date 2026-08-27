@@ -2,7 +2,7 @@
 
 > Tâches, examens, sessions de focus et tuteur IA pour préparer le BAC français avec sérénité.
 
-Edité par Utachi Industries. Live: <https://fatima.utachiindustries.space>
+Edité par Utachi Industries. Live: <https://ontrack.utachiindustries.space>
 
 ![Built with Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149eca?logo=react)
