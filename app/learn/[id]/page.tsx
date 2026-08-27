@@ -28,7 +28,7 @@ export default async function LessonRoute({ params }: { params: Promise<{ id: st
     .from(lessonProgress)
     .where(eq(lessonProgress.userId, session.user.id))
     .orderBy(desc(lessonProgress.completedAt))
-  const completedIds = rows.map((r) => r.lessonId)
+    .catch(() => [] as { lessonId: string }[])
   const alreadyDone = completedIds.includes(lesson.id)
 
   return (

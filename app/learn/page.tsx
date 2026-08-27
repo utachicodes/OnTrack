@@ -22,8 +22,10 @@ export default async function LearnHubPage() {
       .select({ lessonId: lessonProgress.lessonId, score: lessonProgress.score, xpAwarded: lessonProgress.xpAwarded, completedAt: lessonProgress.completedAt })
       .from(lessonProgress)
       .where(eq(lessonProgress.userId, userId))
-      .orderBy(desc(lessonProgress.completedAt)),
-    db.select({ xp: userXp.xp }).from(userXp).where(eq(userXp.userId, userId)).limit(1),
+      .orderBy(desc(lessonProgress.completedAt))
+      .catch(() => [] as { lessonId: string; score: number; xpAwarded: number; completedAt: Date }[]),
+    db.select({ xp: userXp.xp }).from(userXp).where(eq(userXp.userId, userId)).limit(1)
+      .catch(() => [] as { xp: number }[]),
   ])
 
   const xp = xpRow[0]?.xp ?? 0
