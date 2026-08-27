@@ -70,15 +70,19 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   let accentColor: string = 'coral'
 
   if (session?.user?.id) {
-    const rows = await db
-      .select()
-      .from(userPreferences)
-      .where(eq(userPreferences.userId, session.user.id))
-      .limit(1)
-    if (rows[0]) {
-      storedPreference = rows[0].themePreference as 'light' | 'dark' | 'system'
-      resolvedTheme = storedPreference === 'dark' ? 'dark' : 'light'
-      accentColor = rows[0].accentColor
+    try {
+      const rows = await db
+        .select()
+        .from(userPreferences)
+        .where(eq(userPreferences.userId, session.user.id))
+        .limit(1)
+      if (rows[0]) {
+        storedPreference = rows[0].themePreference as 'light' | 'dark' | 'system'
+        resolvedTheme = storedPreference === 'dark' ? 'dark' : 'light'
+        accentColor = rows[0].accentColor
+      }
+    } catch {
+      // Prefs table unreachable — fall back to defaults so the page still renders.
     }
   }
 
