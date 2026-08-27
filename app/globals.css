@@ -611,11 +611,11 @@ html[data-theme="dark"] .xp-card { background: #20232b; border-color: #343844; }
 html[data-theme="dark"] .track-card {
   background: #20232b; border-color: #343844; color: #f4f5f7;
 }
-html[data-theme="dark"] .track-card .track-tag { color: #a4a8b5; }
+html[data-theme="dark"] .track-card .track-tag { color: #c7cbd6; }
 html[data-theme="dark"] .track-lesson { background: #17191f; border-color: #343844; }
 html[data-theme="dark"] .track-lesson .lesson-meta strong { color: #f4f5f7; }
-html[data-theme="dark"] .track-lesson .lesson-meta small { color: #a4a8b5; }
-html[data-theme="dark"] .track-foot { border-color: #343844; color: #a4a8b5; }
+html[data-theme="dark"] .track-lesson .lesson-meta small { color: #c7cbd6; }
+html[data-theme="dark"] .track-foot { border-color: #343844; color: #c7cbd6; }
 html[data-theme="dark"] .track-progress-ring::before { background: #20232b; }
 html[data-theme="dark"] .badge { background: #20232b; border-color: #343844; color: #f4f5f7; }
 html[data-theme="dark"] .badge-icon { background: #2b2e38; color: #a4a8b5; }
@@ -1642,12 +1642,14 @@ html[data-theme="dark"] .empty,
   z-index: 0;
 }
 .learn-page-band > * { position: relative; z-index: 1; }
-
-/* ============================================================
-   Learn pages — hub, track cards, drawer, sims, Pyodide
-   ============================================================ */
+.learn-page-band {
+  background: linear-gradient(140deg, #111315 0%, #1c2030 55%, #2a1f2c 100%);
+  color: #f4f5f7;
+  padding: 56px 24px 88px;
+  position: relative;
+  overflow: hidden;
+}
 .learn-page { min-height: 100dvh; padding: 0; background: var(--paper, #f5f6f8); color: var(--ink, #111315); font-family: var(--font-sans); }
-.learn-hero { display: flex; flex-direction: column; gap: 14px; max-width: 760px; color: #f4f5f7; position: relative; z-index: 1; padding-bottom: 8px; }
 .learn-hero h1 { margin: 0; font: 400 clamp(2.5rem, 5vw, 3.75rem)/1.05 var(--font-instrument); letter-spacing: -0.01em; color: #ffffff; }
 .learn-hero-sub { margin: 0; color: rgba(244, 245, 247, 0.78); font-size: 17px; line-height: 1.65; }
 
@@ -1756,7 +1758,7 @@ html[data-theme="dark"] .track-tag,
 html[data-theme="dark"] .learn-hero-sub,
 html[data-theme="dark"] .xp-foot,
 html[data-theme="dark"] .track-foot,
-html[data-theme="dark"] .lesson-meta small { color: #a4a8b5; }
+html[data-theme="dark"] .lesson-meta small { color: #c7cbd6; }
 html[data-theme="dark"] .track-lesson { background: #17191f; border-color: #2b2e38; }
 html[data-theme="dark"] .lesson-num { background: #20232b; border-color: #2b2e38; }
 html[data-theme="dark"] .drawer { background: #17191f; border-left-color: #2b2e38; }
