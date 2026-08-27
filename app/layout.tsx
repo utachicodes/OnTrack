@@ -61,7 +61,12 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await getSession()
   // Default to LIGHT. Only flip to dark if user explicitly chose dark.
-  let themePreference: 'light' | 'dark' = 'light'
+  // The 'system' preference is intentionally rendered as 'light' on the
+  // server to avoid hydration mismatches with clients whose OS is dark.
+  // ThemeInit upgrades to the OS preference after mount, which does not
+  // cause hydration warnings because it only runs post-mount.
+  let storedPreference: 'light' | 'dark' | 'system' = 'system'
+  let resolvedTheme: 'light' | 'dark' = 'light'
   let accentColor: string = 'coral'
 
   if (session?.user?.id) {
@@ -71,7 +76,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       .where(eq(userPreferences.userId, session.user.id))
       .limit(1)
     if (rows[0]) {
-      themePreference = rows[0].themePreference === 'dark' ? 'dark' : 'light'
+      storedPreference = rows[0].themePreference as 'light' | 'dark' | 'system'
+      resolvedTheme = storedPreference === 'dark' ? 'dark' : 'light'
       accentColor = rows[0].accentColor
     }
   }
@@ -79,18 +85,21 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html
       lang="fr"
-      data-theme={themePreference}
+      data-theme={resolvedTheme}
       data-accent={accentColor}
       className={`${jakarta.variable} ${spaceMono.variable} ${instrumentSerif.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" href="/icon-192.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="antialiased">
         {children}
-        <ThemeInit preference={themePreference} />
+        <ThemeInit preference={storedPreference} />
         <PWABootstrap />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

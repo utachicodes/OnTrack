@@ -16,7 +16,7 @@ export const user = pgTable('user', {
 })
 
 export const userPreferences = pgTable('user_preferences', {
-  userId: text('user_id').primaryKey().references(() => user.id, { onDelete: 'cascade' }),
+  userId: text('user_id').primaryKey(),
   themePreference: themePreferenceEnum('theme_preference').notNull().default('system'),
   accentColor: accentColorEnum('accent_color').notNull().default('coral'),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
