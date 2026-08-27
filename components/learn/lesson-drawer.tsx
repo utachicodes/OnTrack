@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { IconArrow, IconCheck, IconChevron, IconClose, IconSparkles } from '@/components/icons'
 import type { Lesson } from '@/lib/curriculum'
 import { LessonWidget } from '@/components/learn/lesson-widget'
+import { FormulaGrid } from '@/components/learn/formula-card'
 
 const PASS_THRESHOLD = 80
 
@@ -14,7 +15,7 @@ interface LessonDrawerProps {
   onCompleted: (lessonId: string, score: number) => void
 }
 
-type Step = 'intro' | 'practice' | 'quiz' | 'result' | 'done'
+type Step = 'intro' | 'formulas' | 'practice' | 'quiz' | 'result' | 'done'
 
 interface Result {
   score: number
@@ -102,9 +103,10 @@ export function LessonDrawer({ lesson, alreadyDone, onClose, onCompleted }: Less
 
         <div className="drawer-progress">
           {(['intro', 'practice', 'quiz', 'done'] as const).map((s) => {
-            const order = ['intro', 'practice', 'quiz', 'done']
+            const order = ['intro', 'formulas', 'practice', 'quiz', 'done']
             const idx = order.indexOf(step === 'result' ? 'quiz' : step)
-            const active = order.indexOf(s) <= idx
+            const myIdx = order.indexOf(s === 'intro' ? 'intro' : s === 'practice' ? 'practice' : s === 'quiz' ? 'quiz' : 'done')
+            const active = myIdx <= idx
             return <span key={s} className={`pip ${active ? 'is-active' : ''}`} />
           })}
         </div>
@@ -118,8 +120,18 @@ export function LessonDrawer({ lesson, alreadyDone, onClose, onCompleted }: Less
               {lesson.widget && (
                 <div className="lesson-widget-wrap"><LessonWidget spec={lesson.widget} /></div>
               )}
-              <button className="primary-button" onClick={() => setStep('practice')}>
-                {lesson.widget ? 'J\'ai pratiqué' : 'Commencer le quiz'} <IconChevron size={16} />
+              <button className="primary-button" onClick={() => setStep(lesson.formulaCards?.length ? 'formulas' : lesson.widget ? 'practice' : 'quiz')}>
+                {lesson.formulaCards?.length ? 'Voir les formules' : lesson.widget ? "J'ai pratiqué" : 'Commencer le quiz'} <IconChevron size={16} />
+              </button>
+            </div>
+          )}
+
+          {step === 'formulas' && lesson.formulaCards && (
+            <div className="lesson-section">
+              <h3>Formules clés</h3>
+              <FormulaGrid cards={lesson.formulaCards} />
+              <button className="primary-button" onClick={() => setStep(lesson.widget ? 'practice' : 'quiz')}>
+                {lesson.widget ? 'Passer à la pratique' : 'Commencer le quiz'} <IconChevron size={16} />
               </button>
             </div>
           )}

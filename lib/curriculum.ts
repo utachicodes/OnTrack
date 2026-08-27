@@ -10,6 +10,12 @@ export type WidgetSpec =
   | { type: 'cercle-trigo' }
   | { type: 'tangente' }
 
+export type FormulaCard = {
+  label: string
+  formula: string
+  explanation: string
+}
+
 export type QuizQuestion = { q: string; options: string[]; answer: number }
 
 export type Lesson = {
@@ -18,6 +24,7 @@ export type Lesson = {
   minutes: number
   intro: string[]
   keyPoints: string[]
+  formulaCards?: FormulaCard[]
   widget?: WidgetSpec
   quiz: QuizQuestion[]
   /** Source track in the official BAC curriculum (undefined for bonus tracks). */
@@ -248,6 +255,82 @@ const PYTHON_TRACK: Track = {
         { q: 'sum([12, 15, 9, 18]) vaut…', options: ['54', '52', '48'], answer: 0 },
       ],
     },
+    {
+      id: 'py-montecarlo',
+      title: 'Monte-Carlo : estimer π',
+      minutes: 11,
+      intro: [
+        "L'idée est magique : tire des points au hasard dans un carré de côté 1. Si la distance au centre est ≤ 1, le point est dans le quart de cercle. Le ratio points-dans-cercle / points-total converge vers π/4.",
+        "C'est une méthode probabiliste utilisée en physique, finance et IA. Ici, tu l'implémentes de zéro en Python, avec random.random().",
+        "Plus tu tires de points, plus l'estimation s'affine. Essaie 100, puis 10 000.",
+      ],
+      keyPoints: [
+        "random.random() génère un float entre 0 et 1.",
+        "x² + y² ≤ 1 teste si le point est dans le cercle.",
+        "π ≈ 4 × (points dans le cercle) / (points total).",
+        "La précision augmente avec la racine du nombre de points.",
+      ],
+      widget: { type: 'python', task: "Tire 1000 points aléatoires et affiche l'estimation de π arrondie à 4 décimales.", starter: 'import random\nN = 1000\ndans = 0\nfor _ in range(N):\n    x = random.random()\n    y = random.random()\n    if x**2 + y**2 <= 1:\n        dans += 1\npi_est = 4 * dans / N\nprint(round(pi_est, 4))\n', expected: '', hint: 'Le résultat varie aléatoirement autour de 3.14. Toute valeur entre 2.9 et 3.4 est acceptable.' },
+      formulaCards: [
+        { label: 'Estimation de π', formula: 'π ≈ 4 × (N_cercle / N_total)', explanation: 'Le ratio de l\'aire du quart de cercle (π/4) à celle du carré (1) donne π directement.' },
+        { label: 'Loi des grands nombres', formula: 'σ ∝ 1/√N', explanation: 'L\'erreur décroît proportionnellement à la racine du nombre d\'essais : doubler la précision coûte 4× plus de calcul.' },
+      ],
+      quiz: [
+        { q: 'random.random() renvoie…', options: ['Un entier entre 0 et 100', 'Un float entre 0 et 1', 'Toujours 0.5'], answer: 1 },
+        { q: 'Un point (x, y) est dans le cercle si…', options: ['x + y ≤ 1', 'x² + y² ≤ 1', 'x² + y² ≥ 1'], answer: 1 },
+        { q: 'Pour doubler la précision (×2 décimales), il faut…', options: ['2× plus de points', '4× plus de points', '10× plus de points'], answer: 1 },
+      ],
+    },
+    {
+      id: 'py-suites',
+      title: 'Suites : simulation et convergence',
+      minutes: 10,
+      intro: [
+        "Une suite géométrique de raison q : u_{n+1} = q · u_n. Si |q| < 1, la suite converge vers 0. Simule cela en Python : génère les termes, observe la convergence.",
+        "Cas concret du BAC : une suite définie par récurrence — on ne peut pas toujours trouver la formule explicite, mais on peut toujours simuler les premiers termes.",
+      ],
+      keyPoints: [
+        "u_{n+1} = q * u_n génère une suite géométrique de raison q.",
+        "Si |q| < 1 : convergence vers 0. Si |q| > 1 : divergence.",
+        "Le script accumule les valeurs dans une liste pour les analyser.",
+        "round(x, 6) permet de voir les petites décimales.",
+      ],
+      widget: { type: 'python', task: "Génère les 8 premiers termes de u_n avec u_0 = 100 et raison q = 0.5, affiche-les un par ligne arrondis à 2 décimales.", starter: 'u = 100\nq = 0.5\nfor _ in range(8):\n    print(round(u, 2))\n    u = q * u\n', expected: '100.0\n50.0\n25.0\n12.5\n6.25\n3.12\n1.56\n0.78', hint: 'Lance la boucle, affiche u, puis mets à jour u = q * u.' },
+      formulaCards: [
+        { label: 'Suite géométrique', formula: 'u_n = u_0 · qⁿ', explanation: 'La formule explicite évite de calculer tous les termes intermédiaires.' },
+        { label: 'Somme géométrique', formula: 'S_n = u_0 · (1 − qⁿ) / (1 − q)', explanation: 'La somme des n premiers termes d\'une suite géométrique de raison q ≠ 1.' },
+      ],
+      quiz: [
+        { q: 'Si u_0 = 100 et q = 0.5, que vaut u_2 ?', options: ['50', '25', '12.5'], answer: 1 },
+        { q: 'Pour que la suite converge vers 0, il faut…', options: ['|q| > 1', '|q| < 1', 'q = 0'], answer: 1 },
+        { q: 'La formule explicite de la suite géométrique est…', options: ['u_n = u_0 + n·q', 'u_n = u_0 · qⁿ', 'u_n = n · u_0'], answer: 1 },
+      ],
+    },
+    {
+      id: 'py-derivee',
+      title: 'Dérivée numérique',
+      minutes: 10,
+      intro: [
+        "La définition de la dérivée — limite du taux d'accroissement — se simule directement : f'(x) ≈ (f(x+h) − f(x)) / h pour un très petit h. On appelle ça la méthode des différences finies.",
+        "Applique-la à f(x) = x² : la dérivée numérique doit donner 2x. Vérifie pour x = 3 (attend 6.0) et x = 5 (attend 10.0).",
+      ],
+      keyPoints: [
+        "f'(x) ≈ (f(x+h) − f(x)) / h avec h très petit (ex: 1e-6).",
+        "Trop petit h → erreurs d'arrondi numérique.",
+        "Pour f(x) = x², la dérivée exacte vaut 2x.",
+        "Cette méthode marche sur n'importe quelle fonction, même sans formule.",
+      ],
+      widget: { type: 'python', task: "Calcule la dérivée numérique de f(x) = x² en x = 3 avec h = 1e-6. Affiche le résultat arrondi à 4 décimales. Attendu : 6.0", starter: 'def f(x):\n    return x**2\n\nh = 1e-6\nx = 3\nderiv = (f(x + h) - f(x)) / h\nprint(round(deriv, 4))\n', expected: '6.0', hint: 'La formule est (f(x+h) - f(x)) / h. Pour x=3, f(x)=9, f(x+h) ≈ 9.000006.' },
+      formulaCards: [
+        { label: 'Différence finie', formula: "f'(x) ≈ (f(x+h) − f(x)) / h", explanation: 'Pour h très petit, le taux d\'accroissement approche la pente de la tangente.' },
+        { label: 'Différence centrée', formula: "f'(x) ≈ (f(x+h) − f(x−h)) / (2h)", explanation: 'La différence centrée est plus précise car l\'erreur est en O(h²) au lieu de O(h).' },
+      ],
+      quiz: [
+        { q: 'Quelle valeur de h est raisonnable pour une dérivée numérique ?', options: ['h = 1', 'h = 1e-6', 'h = 1e-20'], answer: 1 },
+        { q: 'La dérivée numérique de x² en x = 5 vaut environ…', options: ['5', '10', '25'], answer: 1 },
+        { q: 'Pourquoi la différence centrée est-elle plus précise ?', options: ["Elle évite les nombres flottants", "Elle annule les erreurs d'ordre 1", 'Elle est plus simple à coder'], answer: 1 },
+      ],
+    },
   ],
 }
 
@@ -272,6 +355,11 @@ const PHYSICS_LEGACY: Lesson[] = [
       "Trajectoire parabolique : y = x·tan θ − g·x²/(2v₀²cos²θ).",
     ],
     widget: { type: 'projectile' },
+    formulaCards: [
+      { label: 'Portée', formula: 'R = v₀² · sin(2θ) / g', explanation: 'La portée horizontale dépend du carré de la vitesse initiale et de l\'angle de tir.' },
+      { label: 'Flèche', formula: 'H = v₀² · sin²(θ) / (2g)', explanation: 'La hauteur maximale atteinte est proportionnelle au carré de la composante verticale.' },
+      { label: 'Trajectoire', formula: 'y = x·tan θ − g·x² / (2v₀²cos²θ)', explanation: 'La trajectoire est une parabole dont l\'équation combine les deux composantes du mouvement.' },
+    ],
     quiz: [
       { q: "Pour quel angle la portée est-elle maximale (sans frottements) ?", options: ['30°', '45°', '60°'], answer: 1 },
       { q: 'Au sommet de la trajectoire, la vitesse verticale est…', options: ['Maximale', 'Nulle', 'Négative'], answer: 1 },
@@ -294,6 +382,10 @@ const PHYSICS_LEGACY: Lesson[] = [
       "L'amortissement (frottements) fait mourir l'amplitude, pas la période.",
     ],
     widget: { type: 'pendule' },
+    formulaCards: [
+      { label: 'Période', formula: 'T = 2π√(L/g)', explanation: 'La période d\'oscillation dépend uniquement de la longueur L et de l\'intensité de la pesanteur g.' },
+      { label: 'Fréquence', formula: 'f = 1/T = (1/2π)√(g/L)', explanation: 'La fréquence est l\'inverse de la période — combien d\'aller-retours par seconde.' },
+    ],
     quiz: [
       { q: 'Si on quadruple L, la période…', options: ['Double', 'Quadruple', 'Ne change pas'], answer: 0 },
       { q: 'Changer la masse du pendule change…', options: ['La période', 'Rien sur la période', 'La gravité'], answer: 1 },
@@ -316,6 +408,11 @@ const PHYSICS_LEGACY: Lesson[] = [
       "Orbite circulaire : v = √(G·M/r), ni plus ni moins.",
     ],
     widget: { type: 'orbites' },
+    formulaCards: [
+      { label: 'Gravitation', formula: 'F = G·m·M / r²', explanation: 'La force gravitationnelle est proportionnelle aux masses et inversement proportionnelle au carré de la distance.' },
+      { label: 'Vitesse circulaire', formula: 'v = √(G·M / r)', explanation: 'Cette vitesse exacte maintient une orbite circulaire — ni trop vite (évasion), ni trop lente (chute).' },
+      { label: 'Troisième loi de Kepler', formula: 'T² / a³ = 4π² / (G·M)', explanation: 'Le carré de la période est proportionnel au cube du demi-grand axe de l\'orbite.' },
+    ],
     quiz: [
       { q: 'Une orbite est…', options: ['Un équilibre de forces nulles', 'Une chute perpétuelle ratée', 'Une poussée constante'], answer: 1 },
       { q: 'Si la distance r double, la force gravitationnelle…', options: ['Double', 'Est divisée par 2', 'Est divisée par 4'], answer: 2 },
@@ -340,6 +437,11 @@ const MATHS_LEGACY: Lesson[] = [
       "c translate la courbe verticalement.",
     ],
     widget: { type: 'grapheur' },
+    formulaCards: [
+      { label: 'Parabole', formula: 'f(x) = ax² + bx + c', explanation: 'a contrôle l\'ouverture, b incline la parabole, c la translate verticalement.' },
+      { label: 'Discriminant', formula: 'Δ = b² − 4ac', explanation: 'Si Δ > 0 : deux racines. Si Δ = 0 : une racine double. Si Δ < 0 : aucune racine réelle.' },
+      { label: 'Racines', formula: 'x = (−b ± √Δ) / (2a)', explanation: 'Les deux valeurs de x où la parabole coupe l\'axe des abscisses.' },
+    ],
     quiz: [
       { q: 'Si a < 0 dans ax² + bx + c, la parabole…', options: ['Monte', 'Est inversée (bosse)', 'Disparaît'], answer: 1 },
       { q: 'Une racine de f est une solution de…', options: ['f(x) = 1', 'f(x) = 0', 'x = 0'], answer: 1 },
@@ -362,6 +464,11 @@ const MATHS_LEGACY: Lesson[] = [
       "tan θ = sin θ / cos θ.",
     ],
     widget: { type: 'cercle-trigo' },
+    formulaCards: [
+      { label: 'Identité fondamentale', formula: 'cos²θ + sin²θ = 1', explanation: 'Pythagore appliqué au cercle de rayon 1 : la somme des carrés vaut toujours 1.' },
+      { label: 'Tangente', formula: 'tan θ = sin θ / cos θ', explanation: 'La tangente est le rapport de l\'ordonnée sur l\'abscisse du point du cercle unité.' },
+      { label: 'Complémentarité', formula: 'sin(π/2 − θ) = cos θ', explanation: 'Les fonctions sinus et cosinus sont complémentaires — un décalage de 90° les intervertit.' },
+    ],
     quiz: [
       { q: 'Sur le cercle unité, sin θ correspond à…', options: ["L'abscisse", "L'ordonnée", 'Le rayon'], answer: 1 },
       { q: 'cos²θ + sin²θ vaut…', options: ['0', '1', 'θ'], answer: 1 },
@@ -384,6 +491,11 @@ const MATHS_LEGACY: Lesson[] = [
       "(xⁿ)′ = n·xⁿ⁻¹.",
     ],
     widget: { type: 'tangente' },
+    formulaCards: [
+      { label: 'Définition', formula: "f'(a) = lim[h→0] (f(a+h) − f(a)) / h", explanation: 'La dérivée est la pente de la droite tangente : le taux d\'accroissement instantané.' },
+      { label: 'Puissance', formula: "(xⁿ)' = n · xⁿ⁻¹", explanation: 'Règle de base : on descend l\'exposant et on soustrait 1.' },
+      { label: 'Composition', formula: "(f∘g)'(x) = g'(x) · f'(g(x))", explanation: 'Pour dériver une fonction composée, on multiplie les dérivées de chaque étage.' },
+    ],
     quiz: [
       { q: "Géométriquement, f′(a) représente…", options: ["L'aire sous la courbe", 'La pente de la tangente', 'f(a)'], answer: 1 },
       { q: 'Si f′ > 0 sur un intervalle, f y est…', options: ['Décroissante', 'Croissante', 'Constante'], answer: 1 },
