@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { AuthForm } from '@/components/auth-form'
-import { AuthColumnsArt } from '@/components/auth-columns-art'
 
 export const metadata = {
   title: 'Créer un compte · OnTrack',
@@ -33,10 +32,6 @@ export default function SignUpPage() {
 
         <p className="auth-fineprint">© OnTrack · Prépare ton BAC, pas la panique.</p>
       </section>
-
-      <aside className="auth-art-pane" aria-hidden="true">
-        <AuthColumnsArt />
-      </aside>
     </main>
   )
 }

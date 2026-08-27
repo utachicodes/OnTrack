@@ -1,7 +1,7 @@
 // OnTrack service worker — minimal shell + offline fallback.
 // Cached pages: landing, sign-in, sign-up, legal, dashboard.
 // API calls bypass cache. Static assets: stale-while-revalidate.
-const VERSION = 'ontrack-v2'
+const VERSION = 'ontrack-v3'
 const CORE = [
   '/',
   '/sign-in',
@@ -10,7 +10,9 @@ const CORE = [
   '/dashboard',
   '/learn',
   '/manifest.webmanifest',
-  '/logo.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
 ]
 
 self.addEventListener('install', (event) => {
@@ -76,8 +78,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil((async () => {
     await self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: '/logo.png',
-      badge: '/logo.png',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
       data: { url: payload.url },
     })
   })())

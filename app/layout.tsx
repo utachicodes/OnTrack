@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     title: 'OnTrack',
   },
   icons: {
-    icon: [{ url: '/logo.png', sizes: 'any', type: 'image/png' }],
-    apple: [{ url: '/logo.png', sizes: '180x180', type: 'image/png' }],
+    icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
 }
 
@@ -86,7 +86,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="antialiased">
         {children}

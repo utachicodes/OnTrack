@@ -34,28 +34,6 @@ export function Navbar() {
         >
           OnTrack
         </Link>
-
-        <Link
-          href="/sign-in"
-          className={`inline-flex items-center px-5 py-2 rounded-full border border-white/20 text-white/90 text-sm hover:bg-white/10 transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
-        >
-          Connexion
-        </Link>
-
-        <Link
-          href="/sign-in"
-          aria-label="Connexion"
-          className={`md:hidden flex flex-col items-center justify-center w-8 h-8 transition-[transform,opacity] duration-700 ease-entrance ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-          style={{ transitionDelay: mounted ? '200ms' : '0ms' }}
-        >
-          <span className="block w-6 h-[2px] bg-white" />
-          <span className="block w-6 h-[2px] bg-white mt-1.5" />
-        </Link>
       </div>
     </nav>
   )

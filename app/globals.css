@@ -769,31 +769,24 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
 .auth-page {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(420px, 0.9fr) 1.1fr;
-  background: #0a0c10;
+  place-items: center;
+  background:
+    radial-gradient(900px 520px at 12% -8%, rgba(238, 112, 95, 0.14), transparent 60%),
+    radial-gradient(900px 520px at 96% 108%, rgba(99, 102, 241, 0.12), transparent 60%),
+    #0a0c10;
   color: #f4f5f7;
   font-family: var(--font-sans);
-  border-radius: 24px;
-  overflow: hidden;
-  margin: 12px;
-  border: 1px solid #1c1f29;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-}
-@media (max-width: 1000px) {
-  .auth-page { grid-template-columns: 1fr; margin: 0; border-radius: 0; border: 0; }
+  padding: 40px 20px;
 }
 
-/* --- Left pane: brand + form --- */
+/* --- Centered pane: brand + form --- */
 .auth-form-pane {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 36px 56px 32px;
-  background: linear-gradient(180deg, #0c0e14 0%, #0a0c10 100%);
-}
-@media (max-width: 1000px) {
-  .auth-form-pane { padding: 28px 24px 24px; }
+  align-items: center;
+  width: 100%;
+  max-width: 440px;
 }
 
 .auth-brand {
@@ -806,7 +799,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  align-self: flex-start;
+  margin-bottom: 32px;
 }
 .auth-brand:hover { color: #f4f5f7; }
 .auth-brand-mark {
@@ -831,19 +824,20 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
 
 .auth-card {
   width: 100%;
-  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  align-self: center;
-  margin: 32px 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #1c1f29;
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
 }
 @media (max-width: 1000px) {
-  .auth-card { margin: 16px 0; }
+  .auth-card { padding: 28px 22px 26px; }
 }
 
 .auth-eyebrow {
-  margin: 0;
+  margin: 0 0 10px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.18em;
@@ -851,7 +845,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   color: #8a8f9d;
 }
 
-.auth-head { display: flex; flex-direction: column; gap: 8px; }
+.auth-head { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
 .auth-head h1 {
   margin: 0;
   font-family: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -873,7 +867,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
 }
 
 .auth-fineprint {
-  margin: 0;
+  margin: 24px 0 0;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
@@ -1049,7 +1043,7 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   font-size: 12px;
 }
 .auth-switch {
-  margin: 0;
+  margin: 24px 0 0;
   text-align: center;
   color: #a4a8b5;
   font-size: 13px;
@@ -1096,28 +1090,6 @@ html[data-theme="dark"] .settings-accent-swatch { box-shadow: 0 0 0 1px rgba(255
   text-underline-offset: 3px;
 }
 .auth-footnote a:hover { color: #f4f5f7; }
-
-/* --- Right pane: classical columns illustration --- */
-.auth-art-pane {
-  position: relative;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(ellipse at 50% 30%, #1a1d27 0%, #0a0c10 70%);
-  border-left: 1px solid #1c1f29;
-  overflow: hidden;
-  padding: 40px;
-}
-@media (max-width: 1000px) {
-  .auth-art-pane { display: none; }
-}
-.auth-art {
-  width: 100%;
-  max-width: 520px;
-  height: auto;
-  color: #2a2e3a;
-}
-/* Lift the columns so they read on the dark gradient */
-.auth-art .auth-art-columns use { color: #2f3441; }
 /* ============================================================
    Legal pages — editorial single column, light + dark
    ============================================================ */
@@ -1839,6 +1811,54 @@ html[data-theme="dark"] .pwa-floating { background: #f4f5f7; color: #111315; }
 @media (max-width: 640px) {
   .pwa-floating { left: 18px; right: 18px; justify-content: center; }
 }
+.pwa-ios-hint {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  left: 18px;
+  max-width: 380px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #111315;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 12px 30px rgba(15, 17, 21, 0.35);
+  z-index: 50;
+}
+.pwa-ios-hint p { margin: 0; }
+.pwa-ios-hint strong { color: #ee705f; }
+.pwa-ios-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 12px;
+  line-height: 1;
+}
+.pwa-ios-close {
+  border: 0;
+  background: none;
+  color: #a4a8b5;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+.pwa-ios-close:hover { color: #fff; }
+html[data-theme="dark"] .pwa-ios-hint { background: #f4f5f7; color: #111315; }
+html[data-theme="dark"] .pwa-ios-hint strong { color: #d9503f; }
+html[data-theme="dark"] .pwa-ios-close { color: #8a8f9d; }
+html[data-theme="dark"] .pwa-ios-close:hover { color: #111315; }
 
 /* ============================================================
    Flashcards + Mock exam pages
