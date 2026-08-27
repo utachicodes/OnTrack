@@ -1,8 +1,10 @@
-import { auth } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
+import { auth, isAuthConfigured } from '@/lib/auth'
 
-export default auth.middleware({
-  loginUrl: '/sign-in',
-})
+export default async function proxy(request: NextRequest) {
+  if (!isAuthConfigured()) return NextResponse.next()
+  return auth.middleware({ loginUrl: '/sign-in' })(request)
+}
 
 export const config = {
   matcher: [
