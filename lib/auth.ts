@@ -29,6 +29,9 @@ export function isAuthConfigured() {
 }
 
 export async function getSession() {
+  if (process.env.MOCK_AUTH === 'true') {
+    return { user: { id: 'test-user-id', email: 'test@ontrack.app', name: 'Test User' } }
+  }
   const real = getAuth()
   if (!real) return null
   const { data } = await real.getSession()

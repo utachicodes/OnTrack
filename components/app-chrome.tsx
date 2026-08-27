@@ -58,7 +58,6 @@ const NAV: NavItem[] = [
   { key: 'finance', label: 'Finances', icon: IconFinance, accent: '#7d5fb8', group: 'me' },
   { key: 'flashcards', label: 'Flashcards', icon: IconLayers, accent: '#5266b6', group: 'tools' },
   { key: 'examen-blanc', label: 'Examen blanc', icon: IconPen, accent: '#d4a05a', group: 'tools' },
-  { key: 'profile', label: 'Profil', icon: IconUser, accent: '#5fb87e', group: 'bottom' },
   { key: 'settings', label: 'Réglages', icon: IconSettings, accent: '#7d8291', group: 'bottom' },
 ]
 

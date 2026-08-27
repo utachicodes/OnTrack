@@ -42,44 +42,38 @@ export default async function LearnHubPage() {
   return (
     <AppChrome userName={session.user.name} userImage={session.user.image} active="learn">
       <div className="learn-page">
-        <div className="learn-page-band">
-          <div className="learn-header">
-            <p className="legal-eyebrow" style={{ color: 'rgba(244,245,247,0.7)' }}>
-              Apprendre · {TRACKS.length} pistes · {totalLessons} leçons · {completedLessons} validées
-            </p>
-          </div>
-          <section className="learn-hero">
-            <p className="auth-eyebrow">Programme officiel du BAC 2026</p>
-            <h1>Dix pistes, un seul élan.</h1>
-            <p className="learn-hero-sub">
-              Mathématiques, Physique-Chimie, SVT, Philosophie, Français, Histoire-Géographie, SES, NSI — plus Code et Python en bonus. Leçons courtes, simulations vivantes, quiz. Gagne des points d’XP et débloque des badges.
-            </p>
-            <div className="xp-card">
-              <div className="xp-head">
-                <div>
-                  <p className="legal-eyebrow" style={{ color: '#a4a8b5' }}>Niveau {level}</p>
-                  <h2>{levelTitle(level)}</h2>
-                </div>
-                <div className="xp-readout">
-                  <Sparkles size={18} aria-hidden="true" />
-                  <strong>{xp}</strong>
-                  <span>XP</span>
-                </div>
+        <header className="learn-hero">
+          <p className="eyebrow">
+            Programme officiel du BAC 2026 · {TRACKS.length} pistes · {totalLessons} leçons · {completedLessons} validées
+          </p>
+          <h1>Dix pistes, un seul élan.</h1>
+          <p className="learn-hero-sub">
+            Mathématiques, Physique-Chimie, SVT, Philosophie, Français, Histoire-Géographie, SES, NSI — plus Code et Python en bonus. Leçons courtes, simulations vivantes, quiz. Gagne des points d’XP et débloque des badges.
+          </p>
+          <div className="xp-card">
+            <div className="xp-head">
+              <div>
+                <p className="eyebrow">Niveau {level}</p>
+                <h2>{levelTitle(level)}</h2>
               </div>
-              <div className="xp-bar"><span style={{ width: `${pct}%` }} /></div>
-              <p className="xp-foot">{xp - floor} / {ceil - floor} XP jusqu’au niveau suivant</p>
+              <div className="xp-readout">
+                <Sparkles size={18} aria-hidden="true" />
+                <strong>{xp}</strong>
+                <span>XP</span>
+              </div>
             </div>
-          </section>
-        </div>
+            <div className="xp-bar"><span style={{ width: `${pct}%` }} /></div>
+            <p className="xp-foot">{xp - floor} / {ceil - floor} XP jusqu’au niveau suivant</p>
+          </div>
+        </header>
 
         <div className="learn-shell">
           <LearnClient tracks={TRACKS} completedIds={completions.map((c) => c.lessonId)} />
 
           <section className="badges-section">
             <header className="badges-head">
-              <p className="legal-eyebrow">Récompenses</p>
-              <h2>Badges</h2>
-              <span>{earned.size} / {BADGES.length}</span>
+              <p className="eyebrow">Récompenses</p>
+              <h2>Badges ({earned.size} / {BADGES.length})</h2>
             </header>
             <ul className="badges-grid">
               {BADGES.map((badge) => {
