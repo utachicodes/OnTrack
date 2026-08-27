@@ -169,6 +169,7 @@ export function AppChrome({ userName, active, onNav, searchIndex = [], userImage
           <span className="brand-name">OnTrack</span>
         </Link>
 
+        <nav className="nav-list" aria-label="Navigation principale">
           {!collapsed && <p className="nav-label">Espace de travail</p>}
           {NAV.filter((n) => n.group === 'work').map((item) => {
             const Icon = item.icon
