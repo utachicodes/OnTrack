@@ -161,7 +161,7 @@ export function AITutorPanel() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="Ex. Comment dériver une fonction composée ?"
-            rows={3}
+            rows={2}
             maxLength={2000}
             required
             className="flex min-h-[88px] w-full resize-vertical rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-text-tertiary focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/10 focus-visible:outline-none"

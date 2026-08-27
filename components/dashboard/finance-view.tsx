@@ -24,8 +24,8 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
-function eur(n: number) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+function fcfa(n: number) {
+  return `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n)} FCFA`
 }
 
 export function FinanceView() {
@@ -66,17 +66,17 @@ export function FinanceView() {
       <div className="finance-stats">
         <div className="stat-card stat-balance">
           <p className="eyebrow">Solde</p>
-          <strong className={balance < 0 ? 'is-neg' : ''}>{eur(balance)}</strong>
+          <strong className={balance < 0 ? 'is-neg' : ''}>{fcfa(balance)}</strong>
           <span>toutes opérations confondues</span>
         </div>
         <div className="stat-card">
           <p className="eyebrow">Entrées ce mois</p>
-          <strong>{eur(income)}</strong>
+          <strong>{fcfa(income)}</strong>
           <span>{month.replace('-', ' / ')}</span>
         </div>
         <div className="stat-card">
           <p className="eyebrow">Dépenses ce mois</p>
-          <strong>{eur(spent)}</strong>
+          <strong>{fcfa(spent)}</strong>
           <span>{income > 0 ? `${Math.round((spent / income) * 100)}% des entrées` : 'aucune entrée enregistrée'}</span>
         </div>
       </div>
@@ -99,7 +99,7 @@ export function FinanceView() {
               <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Ex. Cinéma, bourse de la semaine" />
             </Label>
             <Label>
-              Montant (€)
+              Montant (FCFA)
               <Input value={amount} onChange={(e) => setAmount(e.target.value)} type="number" min="0" step="0.5" placeholder="0,00" inputMode="decimal" />
             </Label>
             {kind === 'expense' && (
@@ -127,7 +127,7 @@ export function FinanceView() {
                 <div className="cat-row" key={cat}>
                   <span className="cat-name">{cat}</span>
                   <div className="cat-track"><span style={{ width: `${(val / maxCat) * 100}%` }} /></div>
-                  <strong>{eur(val)}</strong>
+                  <strong>{fcfa(val)}</strong>
                 </div>
               ))}
             </div>
@@ -150,7 +150,7 @@ export function FinanceView() {
                 <small>{t.category} · {new Date(t.at + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</small>
               </div>
               <span className={`tx-amount ${t.kind === 'income' ? 'is-in' : 'is-out'}`}>
-                {t.kind === 'income' ? '+' : '−'}{eur(t.amount)}
+                {t.kind === 'income' ? '+' : '−'}{fcfa(t.amount)}
               </span>
               <Button variant="ghost" size="icon-xs" onClick={() => remove(t.id)} aria-label="Supprimer"><IconClose size={12} /></Button>
             </div>

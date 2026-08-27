@@ -25,25 +25,29 @@ function IconHourglassInline() {
 }
 
 export function OverviewView({ tasks, completed, nextExam, focusThisWeek, nowMs, onTaskToggle, onAddTask, onAddExam }: OverviewProps) {
-  const recent = tasks.slice(0, 5)
+  const recent = tasks.slice(0, 4)
   const todoCount = tasks.filter((t) => t.status === 'todo').length
   const totalMinutes = tasks.reduce((s, t) => s + (t.status === 'done' ? 0 : t.estimatedMinutes), 0)
 
   return (
     <div className="overview-grid">
       <section className="panel hero-panel">
-        <div className="hero-head">
-          <span className="kicker"><IconSparkles size={13} /> Aujourd&apos;hui</span>
-          <span className="kicker-meta"><IconHourglassInline /> {focusThisWeek} sessions cette semaine</span>
+        <div className="hero-main">
+          <div className="hero-head">
+            <span className="kicker"><IconSparkles size={13} /> Aujourd&apos;hui</span>
+            <span className="kicker-meta"><IconHourglassInline /> {focusThisWeek} sessions cette semaine</span>
+          </div>
+          <h2>Ton attention, au bon endroit.</h2>
+          <p className="hero-sub">
+            Tu as <strong>{todoCount} tâche{todoCount > 1 ? 's' : ''}</strong> en cours et <strong>{nextExam ? 1 : 0} examen{nextExam ? '' : ''}</strong> à préparer. Continue.
+          </p>
         </div>
-        <h2>Ton attention, au bon endroit.</h2>
-        <p className="hero-sub">
-          Tu as <strong>{todoCount} tâche{todoCount > 1 ? 's' : ''}</strong> en cours et <strong>{nextExam ? 1 : 0} examen{nextExam ? '' : ''}</strong> à préparer. Continue.
-        </p>
-        <div className="progress-line"><span style={{ width: `${tasks.length ? (completed / tasks.length) * 100 : 0}%` }} /></div>
-        <div className="hero-meta">
-          <span><IconCheck size={13} /> {completed} terminées</span>
-          <span><IconTimer size={13} /> {totalMinutes} min restantes</span>
+        <div className="hero-side">
+          <div className="progress-line"><span style={{ width: `${tasks.length ? (completed / tasks.length) * 100 : 0}%` }} /></div>
+          <div className="hero-meta">
+            <span><IconCheck size={13} /> {completed} terminées</span>
+            <span><IconTimer size={13} /> {totalMinutes} min restantes</span>
+          </div>
         </div>
       </section>
 

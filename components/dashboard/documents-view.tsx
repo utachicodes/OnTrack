@@ -43,7 +43,7 @@ function DocumentUpload({ onUploaded }: { onUploaded: (doc: DocRow) => void }) {
   }
 
   return (
-    <form action={upload} className="doc-upload" encType="multipart/form-data">
+    <form action={upload} className="doc-upload">
       <Label>
         Fichier
         <Input type="file" name="file" accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown" required className="file:mr-4 file:border-0 file:bg-transparent file:text-sm file:font-semibold file:text-foreground" />

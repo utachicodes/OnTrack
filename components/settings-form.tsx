@@ -22,26 +22,49 @@ const ACCENTS = [
 type ThemeValue = (typeof THEMES)[number]['value']
 type AccentValue = (typeof ACCENTS)[number]['value']
 
+interface NotifState {
+  reminders: boolean
+  examAlerts: boolean
+  quietStart: string
+  quietEnd: string
+}
+
 export function SettingsForm({
   initialTheme,
   initialAccent,
+  initialNotif,
   userName,
 }: {
   initialTheme: ThemeValue
   initialAccent: AccentValue
+  initialNotif?: Partial<NotifState>
   userName: string
 }) {
   const [theme, setTheme] = useState<ThemeValue>(initialTheme)
   const [accent, setAccent] = useState<AccentValue>(initialAccent)
+  const [notif, setNotif] = useState<NotifState>({
+    reminders: initialNotif?.reminders ?? true,
+    examAlerts: initialNotif?.examAlerts ?? true,
+    quietStart: initialNotif?.quietStart ?? '22:00',
+    quietEnd: initialNotif?.quietEnd ?? '07:00',
+  })
   const [pending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
 
   const dirty = theme !== initialTheme || accent !== initialAccent
+  const notifDirty = notif.reminders !== (initialNotif?.reminders ?? true)
+    || notif.examAlerts !== (initialNotif?.examAlerts ?? true)
+    || notif.quietStart !== (initialNotif?.quietStart ?? '22:00')
+    || notif.quietEnd !== (initialNotif?.quietEnd ?? '07:00')
 
   function save() {
     const fd = new FormData()
     fd.set('themePreference', theme)
     fd.set('accentColor', accent)
+    fd.set('reminders', notif.reminders ? 'on' : 'off')
+    fd.set('examAlerts', notif.examAlerts ? 'on' : 'off')
+    fd.set('quietStart', notif.quietStart)
+    fd.set('quietEnd', notif.quietEnd)
     startTransition(async () => {
       await updatePreferences(fd)
       setSaved(true)
@@ -102,12 +125,63 @@ export function SettingsForm({
         </div>
       </fieldset>
 
+      <fieldset className="settings-group">
+        <legend className="settings-group-title">Notifications</legend>
+        <div className="settings-notif">
+          <label className="settings-toggle">
+            <input
+              type="checkbox"
+              checked={notif.reminders}
+              onChange={(e) => setNotif((n) => ({ ...n, reminders: e.target.checked }))}
+            />
+            <span className="settings-toggle-track"><span /></span>
+            <span className="settings-toggle-copy">
+              <strong>Rappels de tâches</strong>
+              <small>Sois notifié des échéances qui approchent.</small>
+            </span>
+          </label>
+          <label className="settings-toggle">
+            <input
+              type="checkbox"
+              checked={notif.examAlerts}
+              onChange={(e) => setNotif((n) => ({ ...n, examAlerts: e.target.checked }))}
+            />
+            <span className="settings-toggle-track"><span /></span>
+            <span className="settings-toggle-copy">
+              <strong>Alertes d&apos;examens</strong>
+              <small>Un rappel quelques jours avant chaque examen.</small>
+            </span>
+          </label>
+          <div className="settings-quiet">
+            <span className="settings-toggle-copy">
+              <strong>Heures de tranquillité</strong>
+              <small>Aucune notification pendant cette plage.</small>
+            </span>
+            <div className="settings-quiet-row">
+              <input
+                type="time"
+                value={notif.quietStart}
+                onChange={(e) => setNotif((n) => ({ ...n, quietStart: e.target.value }))}
+                aria-label="Début"
+              />
+              <span>→</span>
+              <input
+                type="time"
+                value={notif.quietEnd}
+                onChange={(e) => setNotif((n) => ({ ...n, quietEnd: e.target.value }))}
+                aria-label="Fin"
+              />
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
       <div className="settings-actions">
         <Button
           type="submit"
           variant="default"
           size="lg"
-          disabled={!dirty || pending}
+          disabled={(!dirty && !notifDirty) || pending}
           className="max-w-[320px]"
         >
           {pending ? 'Enregistrement…' : saved ? 'Enregistré ✓' : 'Enregistrer'}
