@@ -50,6 +50,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // pg uses native bindings; keep it server-side only and avoid Turbopack
+  // junction-point issues on Windows by marking it external.
+  serverExternalPackages: ['pg', 'pg-native'],
   async headers() {
     return [
       {

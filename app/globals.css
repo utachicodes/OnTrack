@@ -3251,3 +3251,116 @@ html[data-theme="dark"] .formula-explain { color: #a4a8b5; }
   .formula-grid { grid-template-columns: 1fr; }
   .lhub-panel { padding: 14px 14px 16px; }
 }
+
+/* ============================================================
+   Python IDE editor — upgraded runner
+   ============================================================ */
+.py-runner { display: flex; flex-direction: column; gap: 12px; }
+
+.py-task {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--primary, #ee705f) 8%, transparent);
+  border-left: 3px solid var(--primary, #ee705f);
+  border-radius: 0 10px 10px 0;
+}
+.py-task-icon { color: var(--primary, #ee705f); margin-top: 2px; flex-shrink: 0; }
+.py-task-label { margin: 0 0 2px; font-size: 9px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary, #ee705f); }
+.py-task-text { margin: 0; font-size: 13px; line-height: 1.5; color: var(--foreground, #252938); }
+html[data-theme="dark"] .py-task-text { color: #f4f5f7; }
+
+.py-stage {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+@media (max-width: 720px) { .py-stage { grid-template-columns: 1fr; } }
+
+/* Editor */
+.py-editor {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid #1e2030;
+  background: #0f1117;
+  display: flex; flex-direction: column;
+}
+.py-editor-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; background: #161922;
+  border-bottom: 1px solid #1e2030;
+  font-size: 11px; color: #6b7280;
+}
+.py-lang-dot { width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; flex-shrink: 0; }
+.py-lang-name { font-weight: 700; color: #d1d5db; font-size: 11px; }
+.py-shortcut { margin-left: auto; font-size: 10px; color: #4b5563; }
+.py-status { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; }
+.py-status--ready { color: #22c55e; }
+.py-status--error { color: #ef4444; }
+.py-status--loading, .py-status--running { color: #60a5fa; }
+.py-dot-ready { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; display: inline-block; }
+
+.py-code-wrap { display: flex; flex: 1; overflow: hidden; }
+.py-lines {
+  display: flex; flex-direction: column; align-items: flex-end;
+  padding: 10px 8px 10px 10px; min-width: 34px;
+  background: #0d1017; border-right: 1px solid #1e2030;
+  user-select: none;
+}
+.py-lines span { font: 11px/1.7 'JetBrains Mono', monospace; color: #4b5563; }
+
+.py-textarea {
+  flex: 1; padding: 10px 12px; border: 0; outline: 0; resize: none;
+  background: #0f1117; color: #e2e8f0;
+  font: 13px/1.7 'JetBrains Mono', 'Fira Code', monospace;
+  caret-color: #60a5fa;
+  tab-size: 4;
+}
+.py-textarea::selection { background: rgba(96, 165, 250, 0.25); }
+
+.py-actions {
+  display: flex; gap: 8px; padding: 8px 10px;
+  background: #161922; border-top: 1px solid #1e2030;
+}
+
+/* Output */
+.py-output {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--panel-border, #ecedf0);
+  background: var(--muted, #f7f8fb);
+  display: flex; flex-direction: column;
+}
+html[data-theme="dark"] .py-output { background: #0d1017; border-color: #1e2030; }
+
+.py-output-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 12px; background: var(--panel, #fff); border-bottom: 1px solid var(--panel-border);
+  font-size: 11px; font-weight: 700; color: #6b7280;
+}
+html[data-theme="dark"] .py-output-head { background: #161922; border-color: #1e2030; }
+.py-badge-ok {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: rgba(34, 197, 94, 0.15); color: #22c55e;
+}
+
+.py-pre {
+  flex: 1; margin: 0; padding: 12px;
+  font: 12.5px/1.7 'JetBrains Mono', monospace;
+  color: var(--foreground, #252938); white-space: pre-wrap; word-break: break-all;
+}
+html[data-theme="dark"] .py-pre { color: #d1d5db; }
+.py-pre--error { color: #ef4444 !important; }
+
+/* Hint */
+.py-hint-toggle {
+  align-self: flex-start; border: 0; background: transparent;
+  font-size: 12px; font-weight: 600; color: #9ba0ab;
+  cursor: pointer; text-decoration: underline; padding: 0;
+}
+.py-hint-toggle:hover { color: var(--primary, #ee705f); }
+.py-hint-body {
+  margin: 0; padding: 10px 14px;
+  background: color-mix(in srgb, var(--primary, #ee705f) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary, #ee705f) 20%, transparent);
+  border-radius: 10px;
+  font: 12.5px/1.6 'JetBrains Mono', monospace;
+  color: var(--foreground, #252938); white-space: pre-wrap;
+}
+html[data-theme="dark"] .py-hint-body { color: #d1d5db; }

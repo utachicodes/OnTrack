@@ -70,10 +70,66 @@ function widgetForChapter(track: BacTrackId, chapterId: string): WidgetSpec | un
 const CODE_TRACK: Track = {
   id: 'code',
   title: 'Bonus · Code : premiers pas',
-  tagline: 'Apprends à penser comme une machine, depuis zéro.',
+  tagline: 'De l\'histoire de l\'informatique jusqu\'à ton premier programme.',
   color: '#7d5fb8',
   bonus: true,
   lessons: [
+    {
+      id: 'code-histoire',
+      title: 'L\'histoire de l\'informatique',
+      minutes: 7,
+      intro: [
+        "Tout commence en 1837 : Charles Babbage dessine sa « machine analytique », un calculateur mécanique avec mémoire et programmes — jamais construit de son vivant, mais la première idée d'ordinateur.",
+        "Ada Lovelace écrit en 1843 le premier algorithme destiné à cette machine. Elle est considérée comme la première programmeuse de l'histoire, un siècle avant les ordinateurs modernes.",
+        "En 1936, Alan Turing formule théoriquement la 'machine de Turing' : un modèle abstrait capable d'exécuter tout programme calculable. Pendant la 2e Guerre Mondiale, il casse Enigma avec Colossus, le premier ordinateur électronique (1943).",
+        "1969 : ARPANET relie 4 universités américaines. C'est l'ancêtre direct d'Internet. 1991 : Tim Berners-Lee invente le Web. 2007 : l'iPhone met un ordinateur dans chaque poche. Aujourd'hui, on programme des IA qui génèrent du texte, des images, des médicaments.",
+      ],
+      keyPoints: [
+        "1837 — Babbage : machine analytique (premier concept d'ordinateur).",
+        "1843 — Ada Lovelace : premier algorithme de l'histoire.",
+        "1936 — Turing : modèle théorique de tout ordinateur.",
+        "1991 — Berners-Lee : invention du World Wide Web.",
+        "Aujourd'hui : IA, cloud, smartphones — tout repose sur les mêmes principes.",
+      ],
+      formulaCards: [
+        { label: 'Loi de Moore', formula: 'Transistors × 2 tous les ~2 ans', explanation: 'Gordon Moore (1965) : la densité de transistors double environ tous les deux ans, expliquant l\'explosion de la puissance des processeurs.' },
+        { label: 'Bit vs Octet', formula: '1 octet = 8 bits', explanation: 'Un bit est 0 ou 1. Un octet (byte) encode 256 valeurs. Un Go = 10⁹ octets.' },
+      ],
+      quiz: [
+        { q: 'Qui est considérée comme la première programmeuse de l\'histoire ?', options: ['Grace Hopper', 'Ada Lovelace', 'Margaret Hamilton'], answer: 1 },
+        { q: 'Quelle guerre a vu naître les premiers ordinateurs électroniques ?', options: ['Guerre froide', 'Première Guerre Mondiale', 'Seconde Guerre Mondiale'], answer: 2 },
+        { q: 'Qui a inventé le World Wide Web en 1991 ?', options: ['Bill Gates', 'Tim Berners-Lee', 'Steve Jobs'], answer: 1 },
+        { q: 'Que modélise la machine de Turing ?', options: ['Un réseau internet', 'Tout ordinateur calculable', 'Un téléphone'], answer: 1 },
+      ],
+    },
+    {
+      id: 'code-ordinateur',
+      title: 'Comment fonctionne un ordinateur ?',
+      minutes: 7,
+      intro: [
+        "Un ordinateur se réduit à 4 composants : le processeur (CPU) qui calcule, la mémoire vive (RAM) qui stocke temporairement les données en cours, le stockage (SSD/disque dur) qui garde tout même éteint, et les entrées/sorties (clavier, écran, réseau).",
+        "Le CPU exécute des instructions élémentaires à des milliards par seconde : additionner deux nombres, copier un octet, sauter à une adresse. Tout logiciel — navigateur, jeu, IA — n'est qu'une longue séquence de ces micro-opérations.",
+        "Un programme Python que tu écris est converti en instructions machine par un interpréteur. Python est dit 'haut niveau' car il te cache cette complexité : tu écris 'print(x)' et l'ordinateur exécute des centaines d'instructions bas niveau.",
+        "Le système d'exploitation (Windows, macOS, Linux) est le chef d'orchestre : il partage le CPU entre les programmes, gère la mémoire, pilote les périphériques. Sans lui, chaque programme devrait tout gérer seul.",
+      ],
+      keyPoints: [
+        "CPU = cerveau, RAM = bureau de travail, SSD = armoire, I/O = mains/yeux.",
+        "Le CPU ne comprend que des 0 et des 1 (binaire).",
+        "Python est interprété : traduit ligne par ligne en temps réel.",
+        "L'OS partage les ressources entre tous les programmes ouverts.",
+      ],
+      formulaCards: [
+        { label: 'Binaire', formula: '1011₂ = 1×8 + 0×4 + 1×2 + 1×1 = 11₁₀', explanation: 'Le processeur ne connaît que 0 et 1. Chaque position vaut une puissance de 2.' },
+        { label: 'Fréquence CPU', formula: '1 GHz = 10⁹ cycles / seconde', explanation: 'À 3 GHz, le processeur peut exécuter ~3 milliards d\'opérations élémentaires par seconde.' },
+      ],
+      widget: { type: 'python', task: "L'ordinateur parle binaire. Affiche la repr\u00e9sentation binaire de 42 avec bin(42), puis le r\u00e9sultat de 0b101010 en d\u00e9cimal (c'est la m\u00eame valeur !). Attendu : '0b101010 42'.", starter: '# bin() convertit en binaire (pr\u00e9fixe 0b)\n# les litt\u00e9raux 0b... sont d\u00e9j\u00e0 en binaire\nprint(bin(42), 0b101010)\n', expected: '0b101010 42', hint: 'print(bin(42), 0b101010)' },
+      quiz: [
+        { q: 'Que signifie RAM ?', options: ['Mémoire permanente', 'Mémoire vive temporaire', 'Processeur'], answer: 1 },
+        { q: 'Quel est le rôle du système d\'exploitation ?', options: ['Afficher des fenêtres uniquement', 'Partager les ressources entre programmes', 'Traduire Python en binaire'], answer: 1 },
+        { q: '1011 en binaire vaut combien en décimal ?', options: ['7', '11', '13'], answer: 1 },
+        { q: 'Python est un langage…', options: ['Bas niveau (machine)', 'Haut niveau (interprété)', 'Compilé en C'], answer: 1 },
+      ],
+    },
     {
       id: 'code-hello',
       title: "Qu'est-ce qu'un programme ?",
