@@ -161,7 +161,7 @@ export function AppChrome({ userName, active, onNav, searchIndex = [], userImage
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? 'Étendre le menu' : 'Réduire le menu'}
         >
-          {collapsed ? <IconMenu size={16} /> : <IconClose size={16} />}
+          {collapsed ? <IconPanelOpen size={16} /> : <IconPanelClose size={16} />}
         </button>
 
         <Link href="/dashboard" className="brand" aria-label="OnTrack, accueil">

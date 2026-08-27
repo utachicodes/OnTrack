@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { IconPen, IconClose } from '@/components/icons'
+import { IconPen, IconTrash } from '@/components/icons'
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -121,7 +121,7 @@ export function ProfileAvatarUpload({
       </div>
       {image && (
         <button type="button" className="avatar-remove" disabled={busy} onClick={remove}>
-          <IconClose size={11} /> Retirer
+          <IconTrash size={12} /> Retirer
         </button>
       )}
       {error && <p className="auth-error" role="alert">{error}</p>}

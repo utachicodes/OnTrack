@@ -103,17 +103,19 @@ button { cursor: pointer; }
   display: none;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--panel-border, #ecedf0);
+  border-radius: 9px;
+  background: var(--panel, #fff);
   color: #7d8291;
   margin-bottom: 14px;
   cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease, transform 150ms ease;
 }
-.rail-toggle:hover { color: #252938; border-color: #252938; }
+.rail-toggle:hover { color: #252938; border-color: #c5c8d1; background: #f7f8fb; }
+html[data-theme="dark"] .rail-toggle { background: #20232b; border-color: #343844; color: #a4a8b5; }
+html[data-theme="dark"] .rail-toggle:hover { color: #f4f5f7; border-color: #555968; background: #282c37; }
 .nav-icon { display: flex; align-items: center; justify-content: center; width: 20px; flex-shrink: 0; color: inherit; }
 
 .app-shell.is-rail .sidebar {
@@ -2428,11 +2430,28 @@ html[data-theme="dark"] .cmd-icon { background: #2a2d36; color: #a4a8b5; }
 .avatar-upload-btn:hover { transform: scale(1.08); }
 .avatar-upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .avatar-remove {
-  margin-top: 8px; border: 0; background: transparent;
-  display: inline-flex; align-items: center; gap: 4px;
-  color: #b0b3bd; font-size: 11px; font-weight: 600; cursor: pointer;
+  margin-top: 10px; border: 1px solid rgba(216, 85, 63, 0.2);
+  background: rgba(216, 85, 63, 0.06);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 5px 12px; border-radius: 999px;
+  color: var(--danger, #d8553f); font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
 }
-.avatar-remove:hover { color: #d8553f; }
+.avatar-remove:hover {
+  background: rgba(216, 85, 63, 0.12);
+  border-color: rgba(216, 85, 63, 0.35);
+  transform: translateY(-1px);
+}
+.avatar-remove:disabled { opacity: 0.5; cursor: not-allowed; }
+html[data-theme="dark"] .avatar-remove {
+  background: rgba(216, 85, 63, 0.12);
+  border-color: rgba(216, 85, 63, 0.3);
+  color: #ff8a76;
+}
+html[data-theme="dark"] .avatar-remove:hover {
+  background: rgba(216, 85, 63, 0.22);
+  border-color: rgba(216, 85, 63, 0.45);
+}
 .avatar-upload .auth-error { margin-top: 8px; }
 @media (max-width: 1000px) { .profile-stats { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 720px) {
@@ -2481,7 +2500,7 @@ html[data-theme="dark"] .cmd-icon { background: #2a2d36; color: #a4a8b5; }
    Final: compact sidebar — no scrollbar needed on laptop heights
    ============================================================ */
 .sidebar { height: 100dvh; overflow: hidden; padding: 16px 12px; }
-.sidebar .brand { padding: 0 12px; margin-bottom: 14px; }
+.sidebar .brand { padding: 0 12px; margin-bottom: 24px; }
 .sidebar .profile-card { padding: 9px 10px; margin-bottom: 14px; }
 .sidebar .nav-list { gap: 2px; }
 .nav-item { height: 39px; font-size: 13.5px; font-weight: 600; gap: 11px; padding: 0 11px; }
@@ -2495,7 +2514,7 @@ html[data-theme="dark"] .cmd-icon { background: #2a2d36; color: #a4a8b5; }
 .app-shell.is-rail .nav-item { height: 40px; }
 @media (max-height: 760px) {
   .sidebar .profile-card { padding: 7px 9px; margin-bottom: 10px; }
-  .sidebar .brand { margin-bottom: 10px; }
+  .sidebar .brand { margin-bottom: 16px; }
   .nav-item { height: 34px; font-size: 12.5px; }
   .nav-label.second { margin-top: 8px; }
   .rail-toggle { margin-bottom: 8px; }

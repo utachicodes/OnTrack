@@ -1,6 +1,6 @@
 'use client'
 
-import { IconAdd, IconClose } from '@/components/icons'
+import { IconAdd, IconTrash } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import type { Exam } from './types'
 import { daysUntil } from './helpers'
@@ -52,7 +52,7 @@ export function ExamsView({ exams, nowMs, onProgress, onDelete, onAdd }: ExamsPr
           aria-label="Progression"
         />
         <Button variant="ghost" size="sm" onClick={() => onDelete(exam.id)}>
-          <IconClose size={12} /> Retirer
+          <IconTrash size={12} /> Retirer
         </Button>
       </div>
     )
