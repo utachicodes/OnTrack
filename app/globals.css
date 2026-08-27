@@ -3364,3 +3364,101 @@ html[data-theme="dark"] .py-pre { color: #d1d5db; }
   color: var(--foreground, #252938); white-space: pre-wrap;
 }
 html[data-theme="dark"] .py-hint-body { color: #d1d5db; }
+
+/* ============================================================
+   PWA / Safe-area inset fixes (iPhone notch + Dynamic Island)
+   ============================================================ */
+
+/* Respect notch/Dynamic Island on all sides */
+body {
+  padding-top:    env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left:   env(safe-area-inset-left);
+  padding-right:  env(safe-area-inset-right);
+}
+
+/* Bottom nav (if any fixed bar) gets extra breathing room on notch devices */
+.bottom-nav, .nav-bar, [data-bottom-nav] {
+  padding-bottom: max(env(safe-area-inset-bottom), 12px);
+}
+
+/* Prevent iOS text size adjustment on rotation */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Momentum scrolling on iOS for all scroll containers */
+.overflow-y-auto, .overflow-y-scroll,
+.lesson-drawer-inner, .lhub-panel,
+.flashcards-list, .dash-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Tap highlight disable — native-app feel */
+* { -webkit-tap-highlight-color: transparent; }
+
+/* Input/textarea — prevent iOS zoom (inputs < 16px trigger auto-zoom) */
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
+/* PWA install modal */
+.pwa-modal-backdrop {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 0 env(safe-area-inset-bottom);
+  backdrop-filter: blur(4px);
+}
+.pwa-modal {
+  background: var(--panel, #fff);
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px 32px;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+}
+html[data-theme="dark"] .pwa-modal { background: #1c1f2a; }
+.pwa-modal h2 { font-size: 20px; font-weight: 800; margin: 0 0 8px; }
+.pwa-modal-text { font-size: 14px; color: var(--muted-foreground, #6b7280); margin: 0 0 20px; line-height: 1.5; }
+.pwa-modal-actions { display: flex; flex-direction: column; gap: 10px; }
+.pwa-modal-primary {
+  width: 100%; padding: 14px; border: 0; border-radius: 12px;
+  background: var(--primary, #ee705f); color: #fff;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.pwa-modal-secondary {
+  width: 100%; padding: 12px; border: 0; border-radius: 12px;
+  background: var(--muted, #f3f4f6); color: var(--foreground, #252938);
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+html[data-theme="dark"] .pwa-modal-secondary { background: #2a2d3a; color: #e2e5ef; }
+.pwa-ios-share { font-size: 16px; }
+
+/* ============================================================
+   Mobile-first responsive patches
+   ============================================================ */
+
+/* Lesson drawer: full height on mobile, respects safe area */
+@media (max-width: 640px) {
+  .lesson-drawer {
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
+  }
+  /* Learn hub tabs compact */
+  .lhub-tab { padding: 8px 10px !important; font-size: 11px !important; }
+  .lhub-tabs { gap: 4px !important; padding-bottom: 8px; }
+  /* Formula grid single column */
+  .formula-grid { grid-template-columns: 1fr !important; }
+  /* Python editor stacked on mobile */
+  .py-stage { grid-template-columns: 1fr !important; }
+  /* Dashboard cards full-width */
+  .dash-grid { grid-template-columns: 1fr !important; }
+  /* Flashcard centered */
+  .flashcard { min-height: 240px !important; }
+}
+
+/* Extra small (SE, Android compact) */
+@media (max-width: 380px) {
+  .lhub-tab-label { display: none; }
+  .lhub-tab { padding: 8px 12px !important; }
+}

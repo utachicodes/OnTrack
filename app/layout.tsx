@@ -40,22 +40,58 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    // black-translucent = the app content extends under the status bar
+    // giving a true full-screen feel on iPhone (like a native app).
+    statusBarStyle: 'black-translucent',
     title: 'OnTrack',
+    startupImage: [
+      // iPhone 15 Pro Max / 14 Pro Max
+      { url: '/splash/apple-splash-1290-2796.png', media: '(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)' },
+      // iPhone 15 Pro / 14 Pro
+      { url: '/splash/apple-splash-1179-2556.png', media: '(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)' },
+      // iPhone 14 Plus / 13 Pro Max / 12 Pro Max
+      { url: '/splash/apple-splash-1284-2778.png', media: '(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)' },
+      // iPhone 14 / 13 / 12
+      { url: '/splash/apple-splash-1170-2532.png', media: '(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)' },
+      // iPhone SE (3rd gen)
+      { url: '/splash/apple-splash-750-1334.png', media: '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)' },
+    ],
   },
   icons: {
-    icon: [{ url: '/icon-192.png', sizes: '192x192', type: 'image/png' }],
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: '/favicon.ico',
+  },
+  other: {
+    // Forces Safari to treat the site as a full-screen web app
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'apple-mobile-web-app-title': 'OnTrack',
+    // Microsoft tiles
+    'msapplication-TileColor': '#ee705f',
+    'msapplication-TileImage': '/icon-192.png',
   },
 }
 
 export const dynamic = 'force-dynamic'
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: [{ media: '(prefers-color-scheme: light)', color: '#ffffff' }],
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)',  color: '#13151c' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  // Prevent iOS auto-zoom on input focus (big UX issue on iPhone)
+  maximumScale: 1,
+  userScalable: false,
+  // viewportFit=cover makes content go under the iPhone notch
+  viewportFit: 'cover',
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
