@@ -1,7 +1,7 @@
 // OnTrack service worker — minimal shell + offline fallback.
 // Cached pages: landing, sign-in, sign-up, legal, dashboard.
 // API calls bypass cache. Static assets: stale-while-revalidate.
-const VERSION = 'ontrack-v4'
+const VERSION = 'ontrack-v5'
 const CORE = [
   '/',
   '/sign-in',
