@@ -42,6 +42,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ vi
   return (
     <DashboardClient
       userName={session.user.name}
+      userImage={session.user.image ?? null}
       nowMs={nowMs}
       initialTasks={userTasks.map((t) => ({
         id: t.id,

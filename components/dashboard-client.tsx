@@ -20,6 +20,7 @@ import { IconAdd } from '@/components/icons'
 
 interface DashboardProps {
   userName: string
+  userImage?: string | null
   initialTasks: Task[]
   initialExams: Exam[]
   focusThisWeek: number
@@ -27,7 +28,7 @@ interface DashboardProps {
   initialView?: NavKey
 }
 
-export function DashboardClient({ userName, initialTasks, initialExams, focusThisWeek, nowMs, initialView = 'overview' }: DashboardProps) {
+export function DashboardClient({ userName, userImage = null, initialTasks, initialExams, focusThisWeek, nowMs, initialView = 'overview' }: DashboardProps) {
   const firstName = userName.trim().split(/\s+/)[0] || 'toi'
 
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
@@ -51,6 +52,7 @@ export function DashboardClient({ userName, initialTasks, initialExams, focusThi
   return (
     <AppChrome
       userName={userName}
+      userImage={userImage}
       active={nav}
       onNav={setNav}
       searchIndex={[

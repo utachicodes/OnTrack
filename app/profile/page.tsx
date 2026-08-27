@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { tasks, exams, focusSessions, userXp } from '@/lib/db/schema'
 import { AppChrome } from '@/components/app-chrome'
 import { SignOutButton } from '@/components/signout-button'
+import { ProfileAvatarUpload } from '@/components/profile-avatar-upload'
 import { IconPen, IconCheck, IconTimer, IconSparkles } from '@/components/icons'
 import { levelForXp, levelTitle, xpFloor, xpCeil } from '@/lib/curriculum'
 
@@ -40,11 +41,9 @@ export default async function ProfilePage() {
   const xpPct = ceil > floor ? Math.min(100, Math.round(((xp - floor) / (ceil - floor)) * 100)) : 100
 
   return (
-    <AppChrome userName={session.user.name} active="profile">
+    <AppChrome userName={session.user.name} userImage={session.user.image} active="profile">
       <div className="profile-head">
-        <div className="profile-avatar">
-          {session.user.name.trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase()}
-        </div>
+        <ProfileAvatarUpload name={session.user.name} image={session.user.image ?? null} />
         <div className="profile-id">
           <p className="eyebrow">Ton profil</p>
           <h1>{session.user.name}</h1>

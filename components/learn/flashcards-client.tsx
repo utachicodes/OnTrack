@@ -148,115 +148,121 @@ export function FlashcardsClient({ initial }: FlashcardsClientProps) {
   const activeCard = review[activeCardIdx]
   const masteredPct = stats.total ? Math.round((stats.mastered / stats.total) * 100) : 0
 
+  const chapterTitle = chapterId ? chapters.find((c) => c.id === chapterId)?.title ?? null : null
+
+  const trackChips = (
+    <div className="chip-row" role="tablist" aria-label="Matières">
+      {BAC_TRACKS.map((t) => (
+        <button
+          key={t.id}
+          role="tab"
+          aria-selected={trackId === t.id}
+          className={`chip ${trackId === t.id ? 'is-active' : ''}`}
+          onClick={() => { setTrackId(t.id); setChapterId(null) }}
+          style={{ ['--chip-color' as string]: t.color } as React.CSSProperties}
+        >
+          <span className="chip-dot" />
+          {t.title}
+        </button>
+      ))}
+    </div>
+  )
+
+  const chapterChips = chapters.length > 0 && (
+    <div className="chip-row sub" role="tablist" aria-label="Chapitres">
+      <button
+        role="tab"
+        aria-selected={!chapterId}
+        className={`chip ${!chapterId ? 'is-active' : ''}`}
+        onClick={() => setChapterId(null)}
+      >
+        Tout le programme
+      </button>
+      {chapters.map((c) => (
+        <button
+          key={c.id}
+          role="tab"
+          aria-selected={chapterId === c.id}
+          className={`chip ${chapterId === c.id ? 'is-active' : ''}`}
+          onClick={() => setChapterId(c.id)}
+        >
+          {c.title}
+        </button>
+      ))}
+    </div>
+  )
+
   return (
-    <div className="fc-layout">
-      <aside className="fc-sidebar">
-        <h3>Matières</h3>
-        <ul className="fc-track-list">
-          {BAC_TRACKS.map((t) => (
-            <li key={t.id}>
-              <button
-                className={`fc-track ${trackId === t.id ? 'is-active' : ''}`}
-                onClick={() => { setTrackId(t.id); setChapterId(null) }}
-                style={{ ['--track-color' as string]: t.color } as React.CSSProperties}
-              >
-                <span className="fc-track-dot" />
-                <span>{t.title}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+    <div className="fc-page">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Flashcards</p>
+          <h2>{track ? (chapterTitle ?? `Tout ${track.title}`) : 'Révision espacée'}</h2>
+        </div>
+      </div>
 
-        {chapters.length > 0 && (
-          <>
-            <h3>Chapitres</h3>
-            <ul className="fc-chapter-list">
-              <li>
-                <button className={`fc-chapter ${!chapterId ? 'is-active' : ''}`} onClick={() => setChapterId(null)}>
-                  Tout le programme
-                </button>
-              </li>
-              {chapters.map((c) => (
-                <li key={c.id}>
-                  <button className={`fc-chapter ${chapterId === c.id ? 'is-active' : ''}`} onClick={() => setChapterId(c.id)}>
-                    {c.title}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </aside>
+      {track ? (
+        <div className="task-stats">
+          <div className="stat-card"><p className="eyebrow">À revoir</p><strong>{stats.dueCount}</strong><span>cartes dues</span></div>
+          <div className="stat-card"><p className="eyebrow">En cours</p><strong>{stats.total - stats.mastered}</strong><span>répétition active</span></div>
+          <div className="stat-card"><p className="eyebrow">Maîtrisées</p><strong>{stats.mastered}</strong><span>{masteredPct}% du deck</span></div>
+        </div>
+      ) : (
+        <div className="empty-line"><IconSparkles size={16} /> Choisis une matière pour commencer.</div>
+      )}
 
-      <section className="fc-main">
-        {track && (
-          <header className="fc-head">
-            <div>
-              <p className="eyebrow">Flashcards · {track.title}</p>
-              <h1>{chapterId ? chapters.find((c) => c.id === chapterId)?.title ?? track.title : `Tout ${track.title}`}</h1>
+      {trackChips}
+      {chapterChips}
+
+      {track && activeCard && (
+        <section className="panel fc-review">
+          <div className={`fc-card ${flipped ? 'is-flipped' : ''}`} onClick={() => setFlipped((f) => !f)}>
+            <div className="fc-card-face fc-card-front">
+              <span className="fc-label">Question</span>
+              <p>{activeCard.front}</p>
             </div>
-            <div className="fc-stats">
-              <div><strong>{stats.dueCount}</strong><span>à revoir</span></div>
-              <div><strong>{stats.total - stats.mastered}</strong><span>en cours</span></div>
-              <div><strong>{stats.mastered}</strong><span>maîtrisées</span></div>
+            <div className="fc-card-face fc-card-back">
+              <span className="fc-label">Réponse</span>
+              <p>{activeCard.back}</p>
             </div>
-          </header>
-        )}
-
-        {!track && (
-          <div className="fc-empty">
-            <IconSparkles size={28} />
-            <h2>Choisis une matière pour réviser.</h2>
-            <p>Flashcards avec répétition espacée (SM-2). Le contenu est pré-rempli pour chaque chapitre.</p>
           </div>
-        )}
 
-        {track && activeCard && (
-          <div className="fc-review">
-            <div className={`fc-card ${flipped ? 'is-flipped' : ''}`} onClick={() => setFlipped((f) => !f)}>
-              <div className="fc-card-face fc-card-front">
-                <span className="fc-label">Question</span>
-                <p>{activeCard.front}</p>
-              </div>
-              <div className="fc-card-face fc-card-back">
-                <span className="fc-label">Réponse</span>
-                <p>{activeCard.back}</p>
-              </div>
-            </div>
+          <p className="fc-progress">{review.length - activeCardIdx} carte{(review.length - activeCardIdx) > 1 ? 's' : ''} restante{(review.length - activeCardIdx) > 1 ? 's' : ''} dans cette session</p>
 
-            <div className="fc-actions">
-              <button className="fc-rating fc-again" disabled={pending} onClick={() => rate('again')}>
-                <strong>Encore</strong>
-                <small>≤ 1 min</small>
-              </button>
-              <button className="fc-rating fc-hard" disabled={pending} onClick={() => rate('hard')}>
-                <strong>Difficile</strong>
-                <small>~ 10 min</small>
-              </button>
-              <button className="fc-rating fc-good" disabled={pending} onClick={() => rate('good')}>
-                <strong>Bien</strong>
-                <small>~ 1 jour</small>
-              </button>
-              <button className="fc-rating fc-easy" disabled={pending} onClick={() => rate('easy')}>
-                <strong>Facile</strong>
-                <small>~ 4 jours</small>
-              </button>
-            </div>
-
-            <p className="fc-progress">{review.length - activeCardIdx} carte{(review.length - activeCardIdx) > 1 ? 's' : ''} restante{(review.length - activeCardIdx) > 1 ? 's' : ''} dans cette session</p>
+          <div className="fc-actions">
+            <button className="fc-rating fc-again" disabled={pending} onClick={() => rate('again')}>
+              <strong>Encore</strong>
+              <small>≤ 1 min</small>
+            </button>
+            <button className="fc-rating fc-hard" disabled={pending} onClick={() => rate('hard')}>
+              <strong>Difficile</strong>
+              <small>~ 10 min</small>
+            </button>
+            <button className="fc-rating fc-good" disabled={pending} onClick={() => rate('good')}>
+              <strong>Bien</strong>
+              <small>~ 1 jour</small>
+            </button>
+            <button className="fc-rating fc-easy" disabled={pending} onClick={() => rate('easy')}>
+              <strong>Facile</strong>
+              <small>~ 4 jours</small>
+            </button>
           </div>
-        )}
+        </section>
+      )}
 
-        {track && !activeCard && stats.total > 0 && (
+      {track && !activeCard && stats.total > 0 && (
+        <section className="panel">
           <div className="fc-empty success">
             <IconCheck size={28} />
             <h2>Tu es à jour !</h2>
             <p>{stats.mastered} carte{stats.mastered > 1 ? 's' : ''} maîtrisée{stats.mastered > 1 ? 's' : ''} · {masteredPct}% du deck.</p>
-            <button className="ghost-button" onClick={() => startReviewSession(cards)}>Réviser tout</button>
+            <button className="primary-button" onClick={() => startReviewSession(cards)}>Réviser tout</button>
           </div>
-        )}
+        </section>
+      )}
 
-        {track && stats.total === 0 && !loading && (
+      {track && stats.total === 0 && !loading && (
+        <section className="panel">
           <div className="fc-empty">
             <h2>Aucune carte dans ce chapitre.</h2>
             <p>Choisis un chapitre ou ajoute ta première carte.</p>
@@ -264,38 +270,41 @@ export function FlashcardsClient({ initial }: FlashcardsClientProps) {
               <IconAdd size={16} /> Créer une carte
             </button>
           </div>
-        )}
+        </section>
+      )}
 
-        <div className="fc-list">
-          <div className="fc-list-head">
+      <section className="panel fc-list">
+        <div className="panel-header">
+          <div>
             <h3>Toutes les cartes ({stats.total})</h3>
-            <button className="ghost-button small" onClick={() => setShowAdd((v) => !v)}>
-              <IconAdd size={14} /> Nouvelle
-            </button>
+            <span>{track ? (chapterTitle ?? 'tout le programme') : 'aucune matière sélectionnée'}</span>
           </div>
-          {showAdd && (
-            <form className="fc-add-form" onSubmit={addCard}>
-              <label><span>Recto</span><input value={newFront} onChange={(e) => setNewFront(e.target.value)} required placeholder="Question ou terme" /></label>
-              <label><span>Verso</span><textarea value={newBack} onChange={(e) => setNewBack(e.target.value)} required rows={2} placeholder="Réponse, formule, définition…" /></label>
-              <div className="fc-add-actions">
-                <button type="button" className="ghost-button small" onClick={() => setShowAdd(false)}>Annuler</button>
-                <button type="submit" className="primary-button small" disabled={pending}>Enregistrer</button>
-              </div>
-            </form>
-          )}
-          <ul>
-            {cards.slice(0, 50).map((c) => (
-              <li key={c.id}>
-                <span className="fc-card-front-line">{c.front}</span>
-                <small>{c.repetitions >= 5 ? 'Maîtrisée' : `Répétée ${c.repetitions}×`}</small>
-                <button className="ghost-button small" onClick={() => removeCard(c.id)} aria-label="Supprimer">
-                  <IconClose size={12} />
-                </button>
-              </li>
-            ))}
-          </ul>
-          {error && <p className="auth-error" role="alert">{error}</p>}
+          <button className="round-add" onClick={() => setShowAdd((v) => !v)} aria-label="Nouvelle carte">
+            <IconAdd size={16} />
+          </button>
         </div>
+        {showAdd && (
+          <form className="fc-add-form" onSubmit={addCard}>
+            <label><span>Recto</span><input value={newFront} onChange={(e) => setNewFront(e.target.value)} required placeholder="Question ou terme" /></label>
+            <label><span>Verso</span><textarea value={newBack} onChange={(e) => setNewBack(e.target.value)} required rows={2} placeholder="Réponse, formule, définition…" /></label>
+            <div className="fc-add-actions">
+              <button type="button" className="ghost-button small" onClick={() => setShowAdd(false)}>Annuler</button>
+              <button type="submit" className="primary-button small" disabled={pending}>Enregistrer</button>
+            </div>
+          </form>
+        )}
+        <ul>
+          {cards.slice(0, 50).map((c) => (
+            <li key={c.id}>
+              <span className="fc-card-front-line">{c.front}</span>
+              <small>{c.repetitions >= 5 ? 'Maîtrisée' : `Répétée ${c.repetitions}×`}</small>
+              <button className="ghost-button small" onClick={() => removeCard(c.id)} aria-label="Supprimer">
+                <IconClose size={12} />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {error && <p className="auth-error" role="alert">{error}</p>}
       </section>
     </div>
   )

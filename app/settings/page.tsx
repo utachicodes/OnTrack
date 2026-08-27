@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   const prefs = await getPreferences()
 
   return (
-    <AppChrome userName={session.user.name} active="settings">
+    <AppChrome userName={session.user.name} userImage={session.user.image} active="settings">
       <div className="section-heading"><div><p className="eyebrow">Préférences</p><h2>Réglages</h2></div></div>
       <SettingsForm
         initialTheme={prefs?.themePreference ?? 'system'}

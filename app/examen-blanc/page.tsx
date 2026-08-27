@@ -43,7 +43,7 @@ export default async function ExamenBlancPage() {
   }
 
   return (
-    <AppChrome userName={session.user.name} active="examen-blanc">
+    <AppChrome userName={session.user.name} userImage={session.user.image} active="examen-blanc">
       <div className="learn-shell">
         <ExamenBlancClient
           initial={{

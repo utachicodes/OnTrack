@@ -35,7 +35,7 @@ export default async function LearnHubPage() {
   const pct = ceil > floor ? Math.min(100, ((xp - floor) / (ceil - floor)) * 100) : 100
 
   return (
-    <AppChrome userName={session.user.name} active="learn">
+    <AppChrome userName={session.user.name} userImage={session.user.image} active="learn">
       <div className="learn-shell">
         <section className="learn-hero">
           <p className="auth-eyebrow">Apprendre</p>

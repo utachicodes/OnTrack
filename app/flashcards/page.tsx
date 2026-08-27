@@ -12,7 +12,7 @@ export default async function FlashcardsPage() {
   if (!session?.user) redirect('/sign-in')
 
   return (
-    <AppChrome userName={session.user.name} active="flashcards">
+    <AppChrome userName={session.user.name} userImage={session.user.image} active="flashcards">
       <div className="learn-shell">
         <FlashcardsClient initial={null} />
       </div>

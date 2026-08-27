@@ -79,10 +79,11 @@ interface AppChromeProps {
   active: ChromeKey
   onNav?: (key: NavKey) => void
   searchIndex?: PaletteEntry[]
+  userImage?: string | null
   children: ReactNode
 }
 
-export function AppChrome({ userName, active, onNav, searchIndex = [], children }: AppChromeProps) {
+export function AppChrome({ userName, active, onNav, searchIndex = [], userImage = null, children }: AppChromeProps) {
   const router = useRouter()
   const initials = useMemo(() => initialsOf(userName), [userName])
   const firstName = useMemo(() => userName.trim().split(/\s+/)[0] || 'toi', [userName])
@@ -169,7 +170,7 @@ export function AppChrome({ userName, active, onNav, searchIndex = [], children 
         </Link>
 
         <Link href="/profile" className="profile-card" aria-label="Voir le profil">
-          <div className="avatar">{initials}</div>
+          <div className="avatar">{userImage ? <img src={userImage} alt="" /> : initials}</div>
           {!collapsed && (
             <div className="profile-meta">
               <strong>{userName}</strong>
@@ -324,7 +325,7 @@ export function AppChrome({ userName, active, onNav, searchIndex = [], children 
               <i className="dot" />
             </button>
             <Link href="/profile" aria-label="Voir le profil">
-              <div className="mini-avatar">{initials}</div>
+              <div className="mini-avatar">{userImage ? <img src={userImage} alt="" /> : initials}</div>
             </Link>
           </div>
         </header>
