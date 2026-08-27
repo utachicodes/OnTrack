@@ -4,7 +4,6 @@ import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { tasks, exams, focusSessions } from '@/lib/db/schema'
 import { DashboardClient } from '@/components/dashboard-client'
-import { seedStarterContent } from '@/app/actions/seed'
 import type { NavKey } from '@/components/dashboard/types'
 
 export const dynamic = 'force-dynamic'
@@ -21,9 +20,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ vi
 
   const sp = (await props.searchParams) ?? {}
   const view = (NAV_KEYS as readonly string[]).includes(sp.view ?? '') ? (sp.view as NavKey) : undefined
-
-  // Seed example tasks/exams if the user has none, and force light theme.
-  await seedStarterContent()
 
   const userId = session.user.id
   const now = new Date()

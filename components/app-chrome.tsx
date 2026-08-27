@@ -24,6 +24,8 @@ import {
   IconLayers,
   IconPen,
   IconUser,
+  IconPanelClose,
+  IconPanelOpen,
 } from '@/components/icons'
 import { PushModal } from '@/components/dashboard/modals'
 import type { NavKey } from '@/components/dashboard/types'

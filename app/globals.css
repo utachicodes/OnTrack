@@ -1516,9 +1516,9 @@ html[data-theme="dark"] .legal-foot { color: #7d8291; border-top-color: #2b2e38;
 .exam-card {
   display: flex; flex-direction: column; gap: 10px;
   padding: 14px;
-  border: 1px solid var(--border, #e8e9ee);
+  border: 1px solid var(--panel-border, #e8e9ee);
   border-radius: 12px;
-  background: #fff;
+  background: var(--panel, #fff);
 }
 .exam-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .exam-card-head strong { display: block; font-size: 14px; }
@@ -1584,9 +1584,9 @@ html[data-theme="dark"] .legal-foot { color: #7d8291; border-top-color: #2b2e38;
   align-items: center;
   gap: 14px;
   padding: 12px;
-  border: 1px solid var(--border, #e8e9ee);
+  border: 1px solid var(--panel-border, #e8e9ee);
   border-radius: 12px;
-  background: #fff;
+  background: var(--panel, #fff);
 }
 .timeline-date { text-align: center; }
 .timeline-date strong { display: block; font: 700 18px/1 var(--font-display); }
@@ -1601,9 +1601,9 @@ html[data-theme="dark"] .legal-foot { color: #7d8291; border-top-color: #2b2e38;
   justify-content: space-between;
   gap: 16px;
   padding: 24px;
-  border: 1px solid var(--border, #e8e9ee);
+  border: 1px solid var(--panel-border, #e8e9ee);
   border-radius: 16px;
-  background: #fff;
+  background: var(--panel, #fff);
 }
 .learn-cta h3 { margin: 0; font: 700 18px/1.2 var(--font-display); }
 .learn-cta p { margin: 6px 0 0; color: #7d8291; font-size: 13px; }
@@ -1684,7 +1684,7 @@ html[data-theme="dark"] .xp-bar { background: #2a2d36; }
 .badge small { font-size: 12px; color: #7d8291; line-height: 1.4; }
 @media (max-width: 1100px) { .tracks-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 720px) { .tracks-grid { grid-template-columns: 1fr; } }
-.track-card { --track-color: #ee705f; padding: 24px 24px; border: 1px solid var(--border, #e8e9ee); border-radius: 18px; background: #ffffff; display: flex; flex-direction: column; gap: 18px; color: #181a23; box-shadow: 0 4px 18px rgba(15, 17, 21, 0.06); }
+.track-card { --track-color: #ee705f; padding: 24px 24px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 18px; background: var(--panel, #ffffff); display: flex; flex-direction: column; gap: 18px; color: inherit; box-shadow: 0 4px 18px rgba(15, 17, 21, 0.06); }
 .track-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .track-head h3 { margin: 4px 0 8px; font: 700 22px/1.2 var(--font-display); letter-spacing: -0.02em; }
 .track-tag { margin: 0; color: #5b6066; font-size: 13.5px; line-height: 1.45; max-width: 36ch; }
@@ -1698,16 +1698,16 @@ html[data-theme="dark"] .xp-bar { background: #2a2d36; }
 .track-progress-ring {
   --p: 0%; width: 64px; height: 64px; border-radius: 50%;
   background: conic-gradient(var(--track-color) var(--p), #f0f1f4 0);
-  display: grid; place-items: center; flex-shrink: 0;
+  display: grid; place-items: center; flex-shrink: 0; position: relative;
 }
-.track-progress-ring::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: #fff; }
+.track-progress-ring::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: var(--panel, #fff); }
 .track-progress-ring span { position: relative; font: 700 13px/1 var(--font-display); color: var(--track-color); }
 
 .track-lessons { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-.track-lesson { width: 100%; display: grid; grid-template-columns: 36px 1fr 16px; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border, #e8e9ee); border-radius: 12px; background: #fff; cursor: pointer; text-align: left; }
+.track-lesson { width: 100%; display: grid; grid-template-columns: 36px 1fr 16px; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border, #e8e9ee); border-radius: 12px; background: var(--panel, #fff); cursor: pointer; text-align: left; color: inherit; }
 .track-lesson:hover { border-color: var(--track-color); }
 .track-lesson.is-done .lesson-num { background: var(--track-color); color: #fff; border-color: var(--track-color); }
-.lesson-num { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; border: 1px solid #e8e9ee; background: #f7f8fb; font: 700 13px/1 var(--font-display); }
+.lesson-num { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; border: 1px solid var(--border, #e8e9ee); background: var(--muted, #f7f8fb); font: 700 13px/1 var(--font-display); color: inherit; }
 .lesson-meta strong { display: block; font-size: 14.5px; }
 .lesson-meta small { display: inline-flex; align-items: center; gap: 6px; color: #5b6066; font-size: 12px; }
 .track-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border, #e8e9ee); font-size: 12.5px; color: #5b6066; font-weight: 600; }
@@ -1726,7 +1726,7 @@ html[data-theme="dark"] .xp-bar { background: #2a2d36; }
 .quiz-list > li { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid var(--border, #e8e9ee); border-radius: 12px; background: var(--card, #fff); }
 .quiz-list strong { font-size: 14px; }
 .quiz-options { display: grid; gap: 6px; }
-.quiz-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border, #e8e9ee); border-radius: 10px; background: #fff; cursor: pointer; text-align: left; font-size: 13px; }
+.quiz-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 10px; background: var(--panel, #fff); cursor: pointer; text-align: left; font-size: 13px; color: inherit; }
 .quiz-option:hover { border-color: var(--primary, #ee705f); }
 .quiz-option.is-selected { border-color: var(--primary, #ee705f); background: #fff5f3; }
 .quiz-option.is-correct { border-color: #5fb87e; background: rgba(95, 184, 126, 0.1); }
@@ -1920,7 +1920,7 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .fc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .fc-head h1 { margin: 6px 0 0; font: 700 clamp(1.5rem, 3vw, 2rem)/1.1 var(--font-display); letter-spacing: -0.02em; }
 .fc-stats { display: flex; gap: 16px; }
-.fc-stats > div { padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; text-align: center; min-width: 70px; }
+.fc-stats > div { padding: 10px 14px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 10px; background: var(--panel, #fff); text-align: center; min-width: 70px; }
 .fc-stats strong { display: block; font: 700 22px/1 var(--font-display); }
 .fc-stats span { display: block; font-size: 11px; color: #7d8291; margin-top: 4px; }
 
@@ -1950,10 +1950,10 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .fc-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 @media (max-width: 640px) { .fc-actions { grid-template-columns: repeat(2, 1fr); } }
 .fc-rating {
-  border: 1px solid var(--border); background: #fff; border-radius: 12px;
+  border: 1px solid var(--panel-border, #e8e9ee); background: var(--panel, #fff); border-radius: 12px;
   padding: 14px; cursor: pointer; text-align: center;
   display: flex; flex-direction: column; gap: 4px;
-  transition: border-color 160ms ease, transform 120ms ease;
+  transition: border-color 160ms ease, transform 120ms ease; color: inherit;
 }
 .fc-rating:hover { transform: translateY(-1px); }
 .fc-rating strong { font-size: 14px; }
@@ -1969,7 +1969,7 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .fc-empty {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
   padding: 60px 20px; text-align: center;
-  border: 1px dashed var(--border); border-radius: 16px; background: #fff;
+  border: 1px dashed var(--panel-border, #e8e9ee); border-radius: 16px; background: var(--panel, #fff);
 }
 .fc-empty.success { border-style: solid; border-color: var(--primary); background: var(--primary-soft); }
 .fc-empty h2 { margin: 0; font: 700 22px/1.2 var(--font-display); }
@@ -1982,8 +1982,8 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .fc-list li {
   display: grid; grid-template-columns: 1fr auto auto; gap: 12px;
   align-items: center; padding: 10px 12px;
-  border: 1px solid var(--border); border-radius: 10px; background: #fff;
-  font-size: 13px;
+  border: 1px solid var(--panel-border, #e8e9ee); border-radius: 10px; background: var(--panel, #fff);
+  font-size: 13px; color: inherit;
 }
 .fc-card-front-line { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fc-list li small { color: #7d8291; font-size: 11px; font-family: var(--font-mono); }
@@ -2018,7 +2018,7 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
   display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px; margin: 24px 0;
 }
-.exam-config-grid .auth-field { padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.exam-config-grid .auth-field { padding: 14px 16px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 12px; background: var(--panel, #fff); color: inherit; }
 .exam-coef { font: 700 22px/1 var(--font-display); color: var(--primary); }
 
 .exam-config-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -2034,7 +2034,7 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .exam-questions { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
 .exam-questions > li, .exam-detail > li {
   display: flex; flex-direction: column; gap: 10px;
-  padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: #fff;
+  padding: 16px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 14px; background: var(--panel, #fff); color: inherit;
 }
 .exam-q-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .exam-q-head strong { font: 700 14px/1.2 var(--font-display); }
@@ -2044,7 +2044,7 @@ html[data-theme="dark"] .pwa-modal-secondary:hover { border-color: #b9bcc4; colo
 .exam-run-foot { display: flex; justify-content: space-between; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 .exam-run-foot .primary-button { background: var(--primary); }
 
-.exam-result-head { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: #fff; }
+.exam-result-head { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; padding: 20px; border: 1px solid var(--panel-border, #e8e9ee); border-radius: 16px; background: var(--panel, #fff); color: inherit; }
 .exam-score-circle {
   width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center;
   background: #f0f1f4; color: #252938;
@@ -2882,3 +2882,187 @@ html[data-theme="dark"] .exam-history-panel .exam-history li { background: #1719
 
 .fc-page .fc-empty, .exam-page .fc-empty { border: 1px dashed var(--panel-border); background: var(--panel); }
 
+/* ============================================================
+   COMPREHENSIVE THEME FIXES
+   ============================================================ */
+
+/* --- Light mode: premium card shadows for a polished look --- */
+.panel,
+.track-card,
+.xp-card,
+.badge,
+.fc-stats > div,
+.fc-rating,
+.exam-result-head,
+.profile-stat,
+.stat-card {
+  box-shadow: 0 1px 3px rgba(20, 24, 40, 0.04), 0 4px 16px -6px rgba(20, 24, 40, 0.08);
+}
+.track-card {
+  box-shadow: 0 2px 8px rgba(20, 24, 40, 0.06), 0 12px 28px -14px rgba(20, 24, 40, 0.12);
+}
+
+/* --- Light mode search-pill should use CSS vars for border/bg --- */
+.search-pill { background: var(--panel, #fff); border-color: var(--panel-border, #ecedf0); }
+.search-pill:hover { border-color: #c5c8d1; }
+
+/* --- Quick modal: use CSS var background --- */
+.quick-modal { background: var(--panel, #fff); color: inherit; }
+.quick-modal input, .quick-modal select { background: var(--surface-alt, #f7f8fb); color: var(--foreground, #252938); border-color: var(--panel-border, #ecedf0); }
+html[data-theme="dark"] .quick-modal input, html[data-theme="dark"] .quick-modal select { background: #17191f; border-color: #343844; color: #f4f5f7; }
+
+/* --- exam-explanation text must adapt to theme --- */
+.exam-explanation { color: var(--foreground, #252938); }
+html[data-theme="dark"] .exam-explanation { color: #f4f5f7; background: rgba(238, 112, 95, 0.1); border-left-color: var(--primary); }
+
+/* --- exam-score-circle: colored variants must win over generic dark rule --- */
+html[data-theme="dark"] .exam-score-circle.is-pass { background: rgba(95, 184, 126, 0.15); color: #5fb87e !important; }
+html[data-theme="dark"] .exam-score-circle.is-mid  { background: rgba(212, 160, 90, 0.15);  color: #d4a05a !important; }
+html[data-theme="dark"] .exam-score-circle.is-fail { background: rgba(216, 85, 63, 0.15);   color: #ff8a76 !important; }
+
+/* --- install-pill hover: don't force pure white --- */
+html[data-theme="dark"] .install-pill:hover { background: rgba(238, 112, 95, 0.18); }
+.install-pill:hover { background: var(--primary-soft, #fff5f3); }
+
+/* --- fc-add-form: dark mode --- */
+html[data-theme="dark"] .fc-add-form { background: rgba(238, 112, 95, 0.07); border-color: rgba(238, 112, 95, 0.3); }
+html[data-theme="dark"] .fc-add-form textarea { background: #17191f; border-color: #343844; color: #f4f5f7; }
+
+/* --- --primary-soft must be dark-transparent in dark mode --- */
+html[data-theme="dark"][data-accent="coral"]   { --primary-soft: rgba(238, 112, 95, 0.15); }
+html[data-theme="dark"][data-accent="indigo"]  { --primary-soft: rgba(82, 102, 182, 0.18); }
+html[data-theme="dark"][data-accent="emerald"] { --primary-soft: rgba(95, 184, 126, 0.15); }
+html[data-theme="dark"][data-accent="amber"]   { --primary-soft: rgba(212, 160, 90, 0.15); }
+html[data-theme="dark"][data-accent="violet"]  { --primary-soft: rgba(125, 95, 184, 0.18); }
+html[data-theme="dark"][data-accent="rose"]    { --primary-soft: rgba(216, 95, 141, 0.18); }
+/* default (no accent attr) */
+html[data-theme="dark"]                        { --primary-soft: rgba(238, 112, 95, 0.15); }
+
+/* --- quiz-option selected/correct/wrong in dark mode --- */
+html[data-theme="dark"] .quiz-option.is-selected { background: rgba(238, 112, 95, 0.12); }
+
+/* --- fc-rating small text in dark mode --- */
+html[data-theme="dark"] .fc-rating small { color: #a4a8b5; }
+html[data-theme="dark"] .fc-rating strong { color: #f4f5f7; }
+
+/* --- Sidebar profile card light mode --- */
+.profile-card { background: var(--panel, #fff); }
+html[data-theme="dark"] .profile-card { background: #20232b; border-color: #343844; }
+
+/* --- topbar icon-button proper color in dark mode --- */
+html[data-theme="dark"] .icon-button { color: #a4a8b5; }
+html[data-theme="dark"] .crumb { color: #6f7585; }
+html[data-theme="dark"] .crumb strong { color: #f4f5f7; }
+
+/* --- modal-backdrop: proper dark overlay --- */
+html[data-theme="dark"] .cmd-backdrop { background: rgba(0, 0, 0, 0.7); }
+.cmd-backdrop { background: rgba(30, 32, 42, 0.4); }
+
+/* --- Exam card additional dark mode fixes --- */
+html[data-theme="dark"] .exam-card-head strong { color: #f4f5f7; }
+html[data-theme="dark"] .exam-card-head span   { color: #a4a8b5; }
+html[data-theme="dark"] .progress-row strong   { color: #f4f5f7; }
+
+/* --- timeline in dark mode --- */
+html[data-theme="dark"] .timeline-date strong  { color: #f4f5f7; }
+html[data-theme="dark"] .timeline-date span    { color: #a4a8b5; }
+html[data-theme="dark"] .timeline-body strong  { color: #f4f5f7; }
+html[data-theme="dark"] .timeline-body span    { color: #a4a8b5; }
+
+/* --- fc-stats span in dark mode --- */
+html[data-theme="dark"] .fc-stats span { color: #a4a8b5; }
+html[data-theme="dark"] .fc-stats strong { color: #f4f5f7; }
+
+/* --- fc-list li text in dark mode --- */
+html[data-theme="dark"] .fc-list li { border-color: #2b2e38; }
+html[data-theme="dark"] .fc-list li small { color: #a4a8b5; }
+
+/* --- learn-cta in dark mode --- */
+html[data-theme="dark"] .learn-cta h3 { color: #f4f5f7; }
+html[data-theme="dark"] .learn-cta p  { color: #a4a8b5; }
+
+/* --- xp-card foot in dark --- */
+html[data-theme="dark"] .xp-foot  { color: #a4a8b5; }
+html[data-theme="dark"] .xp-readout span { color: #6f7585; }
+
+/* --- badge earned border glow --- */
+html[data-theme="dark"] .badge.is-earned { border-color: color-mix(in srgb, var(--primary) 40%, transparent); }
+
+/* --- track-tag and lesson-meta small in dark --- */
+html[data-theme="dark"] .track-tag     { color: #a4a8b5; }
+html[data-theme="dark"] .lesson-meta small { color: #a4a8b5; }
+html[data-theme="dark"] .track-foot    { color: #a4a8b5; border-color: #343844; }
+
+/* --- learn-foot in dark --- */
+html[data-theme="dark"] .learn-foot    { color: #a4a8b5; }
+html[data-theme="dark"] .learn-foot strong { color: #f4f5f7; }
+
+/* --- learn page overall color in dark --- */
+html[data-theme="dark"] .learn-page { background: transparent; color: #f4f5f7; }
+
+/* --- exam subhead in dark --- */
+html[data-theme="dark"] .exam-result-head .subhead { color: #a4a8b5; }
+html[data-theme="dark"] .exam-result-head h2 { color: #f4f5f7; }
+html[data-theme="dark"] .exam-q-head small { color: #a4a8b5; }
+html[data-theme="dark"] .exam-q-text { color: #f4f5f7; }
+
+/* --- Settings page dark: make option-label use CSS var not hardcoded #fff --- */
+html[data-theme="dark"] .settings-option.is-selected { background: rgba(238, 112, 95, 0.08); border-color: var(--primary); }
+
+/* --- focus-banner: use CSS var so it works in dark --- */
+html[data-theme="dark"] .focus-copy strong { color: #f4f5f7; }
+
+/* --- Light mode: better contrast for nav hover/active --- */
+.nav-item:hover { background: color-mix(in srgb, currentColor 7%, transparent); }
+.nav-item.is-active { font-weight: 700; }
+
+/* ============================================================
+   Lesson page layout (app/learn/[id])
+   ============================================================ */
+.learn-shell { display: flex; flex-direction: column; gap: 28px; }
+
+.lesson-page-card {
+  display: flex; flex-direction: column; gap: 20px;
+  padding: 28px 32px;
+  background: var(--panel, #fff);
+  border: 1px solid var(--panel-border, #ecedf0);
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(20, 24, 40, 0.06);
+  color: inherit;
+}
+html[data-theme="dark"] .lesson-page-card { background: #20232b; border-color: #343844; }
+
+.lesson-page-section { display: flex; flex-direction: column; gap: 14px; }
+.lesson-page-section p.legal-eyebrow { margin-bottom: 4px; }
+.lesson-page-section ul { margin: 0; padding: 0 0 0 20px; display: flex; flex-direction: column; gap: 6px; }
+.lesson-page-section ul li { font-size: 14.5px; line-height: 1.6; color: var(--foreground, #252938); }
+html[data-theme="dark"] .lesson-page-section ul li { color: #d4d6dd; }
+
+.lesson-page-widget { margin-top: 4px; }
+
+.lesson-page-cta {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  padding-top: 18px; border-top: 1px solid var(--panel-border, #ecedf0);
+}
+html[data-theme="dark"] .lesson-page-cta { border-top-color: #343844; }
+
+.lesson-page-meta {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+@media (max-width: 640px) { .lesson-page-meta { grid-template-columns: 1fr; } }
+
+.lesson-meta-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  background: var(--panel, #fff);
+  border: 1px solid var(--panel-border, #ecedf0);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(20, 24, 40, 0.05);
+  color: var(--primary, #ee705f);
+}
+.lesson-meta-card > div { display: flex; flex-direction: column; gap: 2px; }
+.lesson-meta-card strong { font: 700 16px/1 var(--font-display); color: var(--foreground, #252938); }
+.lesson-meta-card small { font-size: 11px; color: #8a8e9c; text-transform: uppercase; letter-spacing: 0.1em; }
+html[data-theme="dark"] .lesson-meta-card { background: #20232b; border-color: #343844; }
+html[data-theme="dark"] .lesson-meta-card strong { color: #f4f5f7; }
+html[data-theme="dark"] .lesson-meta-card small { color: #a4a8b5; }
