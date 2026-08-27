@@ -1651,7 +1651,10 @@ html[data-theme="dark"] .learn-cta { background: #20232b; border-color: #343844;
 html[data-theme="dark"] .timeline-body span,
 html[data-theme="dark"] .goal-list li > div small,
 html[data-theme="dark"] .exam-card-head span,
-html[data-theme="dark"] .empty,
+html[data-theme="dark"] .empty { color: #a4a8b5; }
+html[data-theme="dark"] .timeline-date strong,
+html[data-theme="dark"] .timeline-body strong { color: #f4f5f7; }
+html[data-theme="dark"] .timeline-date span { color: #a4a8b5; }
 .learn-page { min-height: 100dvh; padding: 0; background: transparent; color: var(--ink, #111315); font-family: var(--font-sans); display: flex; flex-direction: column; gap: 24px; }
 .learn-hero { display: flex; flex-direction: column; gap: 10px; }
 .learn-hero h1 { margin: 0; font: 800 clamp(28px, 3.6vw, 38px)/1.08 var(--font-display); letter-spacing: -0.04em; color: inherit; }
@@ -2119,6 +2122,8 @@ html[data-theme="dark"] .topbar { background: rgba(23, 25, 31, 0.85); border-bot
 
 /* Rail toggle is the only way in/out of the collapsed rail — keep it visible in both states. */
 .rail-toggle { display: inline-flex; align-items: center; justify-content: center; margin: 0 0 14px; }
+html[data-theme="dark"] .rail-toggle { background: #20232b; color: #a4a8b5; border-color: #343844; }
+html[data-theme="dark"] .rail-toggle:hover { background: #2a2d36; color: #f4f5f7; border-color: #4a4e5d; }
 
 .content { max-width: 1280px; padding: 20px 44px 40px; }
 
