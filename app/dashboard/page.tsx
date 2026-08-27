@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { tasks, exams, focusSessions } from '@/lib/db/schema'
 import { DashboardClient } from '@/components/dashboard-client'
 import { seedStarterContent } from '@/app/actions/seed'
+import type { NavKey } from '@/components/dashboard/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,9 +13,14 @@ export const metadata = {
   title: 'Tableau de bord · OnTrack',
 }
 
-export default async function DashboardPage() {
+const NAV_KEYS = ['overview', 'tasks', 'exams', 'planning', 'focus', 'learn', 'documents', 'goals', 'habits', 'finance'] as const
+
+export default async function DashboardPage(props: { searchParams?: Promise<{ view?: string }> }) {
   const session = await getSession()
   if (!session?.user) redirect('/sign-in')
+
+  const sp = (await props.searchParams) ?? {}
+  const view = (NAV_KEYS as readonly string[]).includes(sp.view ?? '') ? (sp.view as NavKey) : undefined
 
   // Seed example tasks/exams if the user has none, and force light theme.
   await seedStarterContent()
@@ -54,6 +60,7 @@ export default async function DashboardPage() {
         preparationPercent: e.preparationPercent,
       }))}
       focusThisWeek={recentFocus.filter((f) => f.status === 'completed').length}
+      initialView={view}
     />
   )
 }

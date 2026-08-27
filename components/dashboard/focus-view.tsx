@@ -9,7 +9,7 @@ export function FocusView({ thisWeek, onFocusComplete }: { thisWeek: number; onF
       <div className="section-heading"><div><p className="eyebrow">Sessions</p><h2>Focus</h2></div></div>
       <div className="dashboard-grid two">
         <section className="panel">
-          <div className="panel-header"><div><h3>Pomodoro</h3><span>25 minutes, sans interruption</span></div></div>
+          <div className="panel-header"><div><h3>Pomodoro</h3><span>Choisis ta durée</span></div></div>
           <Pomodoro defaultMinutes={25} onComplete={onFocusComplete} />
         </section>
         <section className="panel">

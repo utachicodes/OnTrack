@@ -20,6 +20,7 @@ function formatTime(seconds: number): string {
 }
 
 export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?: number; onComplete?: () => void }) {
+  const [duration, setDuration] = useState(defaultMinutes)
   const [active, setActive] = useState<FocusSessionRow | null>(null)
   const [remaining, setRemaining] = useState(defaultMinutes * 60)
   const [completed, setCompleted] = useState(0)
@@ -70,7 +71,7 @@ export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?:
   }, [active?.id])
 
   async function start() {
-    const row = await startFocusSession({ durationMinutes: defaultMinutes })
+    const row = await startFocusSession({ durationMinutes: duration })
     setActive({
       id: row.id,
       durationMinutes: row.durationMinutes,
@@ -83,7 +84,7 @@ export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?:
     if (!active) return
     await completeFocusSession(active.id, status)
     setActive(null)
-    setRemaining(defaultMinutes * 60)
+    setRemaining(duration * 60)
     if (status === 'completed') {
       setCompleted((c) => c + 1)
       onComplete?.()
@@ -100,8 +101,16 @@ export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?:
     }
   }
 
-  const total = (active?.durationMinutes ?? defaultMinutes) * 60
+  const total = (active?.durationMinutes ?? duration) * 60
   const progress = Math.max(0, Math.min(1, 1 - remaining / total))
+
+  const presets = [15, 25, 45, 60]
+
+  function pick(d: number) {
+    if (active) return
+    setDuration(d)
+    setRemaining(d * 60)
+  }
 
   return (
     <div className="pomodoro">
@@ -111,10 +120,24 @@ export function Pomodoro({ defaultMinutes = 25, onComplete }: { defaultMinutes?:
           <span className="pomodoro-label">{active ? 'En cours' : 'Prêt'}</span>
         </div>
       </div>
+      {!active && (
+        <div className="pomodoro-durations">
+          {presets.map((d) => (
+            <button
+              key={d}
+              type="button"
+              className={`duration-chip ${duration === d ? 'is-active' : ''}`}
+              onClick={() => pick(d)}
+            >
+              {d} min
+            </button>
+          ))}
+        </div>
+      )}
       <div className="pomodoro-actions">
         {!active && (
           <Button variant="default" size="lg" onClick={start}>
-            <IconHourglass size={16} /> Démarrer {defaultMinutes} min
+            <IconHourglass size={16} /> Démarrer {duration} min
           </Button>
         )}
         {active && (

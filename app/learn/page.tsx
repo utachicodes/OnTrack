@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { ArrowLeft, BookOpen, Sparkles } from 'lucide-react'
+import { BookOpen, Sparkles } from 'lucide-react'
 import { redirect } from 'next/navigation'
 import { getSession } from '@/lib/auth'
 import { ALL_LESSONS, BADGES, TRACKS, earnedBadges, levelForXp, levelTitle, xpFloor, xpCeil } from '@/lib/curriculum'
@@ -7,6 +6,7 @@ import { db } from '@/lib/db'
 import { lessonProgress, userXp } from '@/lib/db/schema'
 import { and, eq, desc } from 'drizzle-orm'
 import { LearnClient } from '@/components/learn/learn-client'
+import { AppChrome } from '@/components/app-chrome'
 
 export const metadata = {
   title: 'Apprendre · OnTrack',
@@ -35,14 +35,7 @@ export default async function LearnHubPage() {
   const pct = ceil > floor ? Math.min(100, ((xp - floor) / (ceil - floor)) * 100) : 100
 
   return (
-    <main className="learn-page">
-      <header className="learn-header">
-        <Link href="/dashboard" className="legal-back">
-          <ArrowLeft size={14} /> Tableau de bord
-        </Link>
-        <span className="legal-eyebrow">Académie</span>
-      </header>
-
+    <AppChrome userName={session.user.name} active="learn">
       <div className="learn-shell">
         <section className="learn-hero">
           <p className="auth-eyebrow">Apprendre</p>
@@ -91,6 +84,6 @@ export default async function LearnHubPage() {
           </ul>
         </section>
       </div>
-    </main>
+    </AppChrome>
   )
 }

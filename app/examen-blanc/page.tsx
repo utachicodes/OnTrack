@@ -1,9 +1,8 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
 import { headers } from 'next/headers'
 import { getSession } from '@/lib/auth'
 import { ExamenBlancClient } from '@/components/learn/examen-blanc-client'
+import { AppChrome } from '@/components/app-chrome'
 import { db } from '@/lib/db'
 import { mockExams } from '@/lib/db/schema'
 import { desc, eq } from 'drizzle-orm'
@@ -44,14 +43,7 @@ export default async function ExamenBlancPage() {
   }
 
   return (
-    <main className="learn-page">
-      <header className="learn-header">
-        <Link href="/dashboard" className="legal-back">
-          <ArrowLeft size={14} /> Tableau de bord
-        </Link>
-        <span className="legal-eyebrow">Évaluation chronométrée</span>
-      </header>
-
+    <AppChrome userName={session.user.name} active="examen-blanc">
       <div className="learn-shell">
         <ExamenBlancClient
           initial={{
@@ -69,6 +61,6 @@ export default async function ExamenBlancPage() {
           }}
         />
       </div>
-    </main>
+    </AppChrome>
   )
 }
