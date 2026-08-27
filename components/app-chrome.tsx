@@ -169,18 +169,6 @@ export function AppChrome({ userName, active, onNav, searchIndex = [], userImage
           <span className="brand-name">OnTrack</span>
         </Link>
 
-        <Link href="/profile" className="profile-card" aria-label="Voir le profil">
-          <div className="avatar">{userImage ? <img src={userImage} alt="" /> : initials}</div>
-          {!collapsed && (
-            <div className="profile-meta">
-              <strong>{userName}</strong>
-              <span>Terminale · BAC 2026</span>
-            </div>
-          )}
-          {!collapsed && <IconChevron size={13} />}
-        </Link>
-
-        <nav className="nav-list" aria-label="Navigation principale">
           {!collapsed && <p className="nav-label">Espace de travail</p>}
           {NAV.filter((n) => n.group === 'work').map((item) => {
             const Icon = item.icon

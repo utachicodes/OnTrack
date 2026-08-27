@@ -1632,18 +1632,20 @@ html[data-theme="dark"] .timeline-body span,
 html[data-theme="dark"] .goal-list li > div small,
 html[data-theme="dark"] .exam-card-head span,
 html[data-theme="dark"] .empty,
-html[data-theme="dark"] .empty-state { color: #a4a8b5; }
-html[data-theme="dark"] .progress-row input[type="range"] { accent-color: var(--primary); }
-html[data-theme="dark"] .doc-upload input, html[data-theme="dark"] .doc-upload select { background: #17191f; border-color: #2b2e38; color: #f4f5f7; }
-html[data-theme="dark"] .date-chip.urgent { background: rgba(216, 85, 63, 0.12); }
-html[data-theme="dark"] .agenda-tag.urgent { background: rgba(216, 85, 63, 0.12); color: #ff8a76; }
-html[data-theme="dark"] .days-badge.urgent { background: #d8553f; }
-html[data-theme="dark"] .pomodoro-ring::before { background: #17191f; }
+.learn-page-band::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(700px 320px at 80% 0%, rgba(238, 112, 95, 0.32), transparent 60%),
+    radial-gradient(600px 280px at 10% 100%, rgba(82, 102, 182, 0.32), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+.learn-page-band > * { position: relative; z-index: 1; }
 
 /* ============================================================
    Learn pages — hub, track cards, drawer, sims, Pyodide
    ============================================================ */
-/* Dark hero band so the page doesn't look like a white slab. */
 .learn-page { min-height: 100dvh; padding: 0; background: var(--paper, #f5f6f8); color: var(--ink, #111315); font-family: var(--font-sans); }
 .learn-hero { display: flex; flex-direction: column; gap: 14px; max-width: 760px; color: #f4f5f7; position: relative; z-index: 1; padding-bottom: 8px; }
 .learn-hero h1 { margin: 0; font: 400 clamp(2.5rem, 5vw, 3.75rem)/1.05 var(--font-instrument); letter-spacing: -0.01em; color: #ffffff; }
