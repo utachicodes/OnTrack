@@ -41,6 +41,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   PenSquare,
+  Trash2,
 } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
@@ -89,6 +90,7 @@ export const IconPanelClose = wrap(PanelLeftClose)
 export const IconPanelOpen  = wrap(PanelLeftOpen)
 export const IconPen        = wrap(PenSquare)
 export const IconFlame      = wrap(Flame)
+export const IconTrash      = wrap(Trash2)
 
 /* Form icons. */
 export const IconEye      = (p: IconProps) => { const { size = 16, ...r } = p; return <Eye size={size} strokeWidth={1.6} {...(r as object)} /> }
